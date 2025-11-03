@@ -1,0 +1,357 @@
+import { useState } from 'react';
+import axios from 'axios';
+import SkillSelector from '../components/SkillSelector';
+import { Upload, CheckCircle2, AlertCircle, Loader, GraduationCap, FileText } from 'lucide-react';
+
+export default function SubmitActivity() {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: 'Technical',
+    eventDate: '',
+    organizingBody: '',
+    achievementLevel: 'College'
+  });
+
+  const [selectedSkills, setSelectedSkills] = useState({
+    technicalSkills: [],
+    softSkills: [],
+    tools: []
+  });
+
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (selectedSkills.technicalSkills.length === 0 && 
+        selectedSkills.softSkills.length === 0 && 
+        selectedSkills.tools.length === 0) {
+      setError('Please select at least one skill');
+      return;
+    }
+
+    setLoading(true);
+
+    const formDataObj = new FormData();
+    Object.keys(formData).forEach(key => {
+      formDataObj.append(key, formData[key]);
+    });
+
+    formDataObj.append('selectedTechnicalSkills', JSON.stringify(selectedSkills.technicalSkills));
+    formDataObj.append('selectedSoftSkills', JSON.stringify(selectedSkills.softSkills));
+    formDataObj.append('selectedTools', JSON.stringify(selectedSkills.tools));
+
+    if (file) {
+      formDataObj.append('document', file);
+    }
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/activities/submit',
+        formDataObj,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      setSuccess(true);
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 2000);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Error submitting activity');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-white via-orange-50/20 to-white">
+      {/* Header Section */}
+      <div className="border-b border-gray-100 bg-gradient-to-b from-white to-orange-50/30 sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-8 py-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-gradient-to-br from-orange-600 to-orange-500 p-3 rounded-xl shadow-lg">
+              <GraduationCap size={28} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900">Submit Achievement</h1>
+              <p className="text-gray-600 font-medium mt-1">Document your accomplishments and verify them instantly</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-8 py-12">
+        {/* Success Alert */}
+        {success && (
+          <div className="mb-8 bg-green-50 border-2 border-green-300 rounded-xl p-6 flex items-start gap-4 animate-fadeInUp">
+            <CheckCircle2 size={28} className="text-green-600 flex-shrink-0 mt-1" />
+            <div>
+              <h3 className="font-bold text-green-900 text-lg">Activity Submitted Successfully!</h3>
+              <p className="text-green-700 font-medium mt-1">Redirecting to dashboard...</p>
+            </div>
+          </div>
+        )}
+
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-8 bg-red-50 border-2 border-red-300 rounded-xl p-6 flex items-start gap-4 animate-fadeInUp">
+            <AlertCircle size={28} className="text-red-600 flex-shrink-0 mt-1" />
+            <div>
+              <h3 className="font-bold text-red-900 text-lg">Submission Error</h3>
+              <p className="text-red-700 font-medium mt-1">{error}</p>
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          
+          {/* Activity Details Section */}
+          <div className="bg-white p-8 rounded-2xl border-2 border-gray-100 shadow-lg hover:shadow-xl transition duration-300">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="bg-gradient-to-br from-orange-600 to-orange-500 p-3 rounded-lg">
+                <FileText size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Activity Details</h2>
+                <p className="text-gray-600 font-medium text-sm mt-1">Share the details of your achievement</p>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {/* Title */}
+              <div>
+                <label className="block text-gray-900 font-bold mb-3">Achievement Title *</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="e.g., Won State Level Hackathon"
+                  className="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-medium transition"
+                  required
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-gray-900 font-bold mb-3">Detailed Description *</label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Describe your achievement in detail including your role, impact, and outcomes..."
+                  className="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-medium h-40 resize-none transition"
+                  required
+                />
+              </div>
+
+              {/* Category and Date Grid */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-gray-900 font-bold mb-3">Category *</label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 font-medium bg-white cursor-pointer transition"
+                  >
+                    <option>Technical</option>
+                    <option>Sports</option>
+                    <option>Cultural</option>
+                    <option>Volunteering</option>
+                    <option>Internship</option>
+                    <option>Leadership</option>
+                    <option>Academic</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-gray-900 font-bold mb-3">Event Date *</label>
+                  <input
+                    type="date"
+                    name="eventDate"
+                    value={formData.eventDate}
+                    onChange={handleChange}
+                    className="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 font-medium bg-white transition"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Organizing Body and Achievement Level Grid */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-gray-900 font-bold mb-3">Organizing Body</label>
+                  <input
+                    type="text"
+                    name="organizingBody"
+                    value={formData.organizingBody}
+                    onChange={handleChange}
+                    placeholder="e.g., Government of India, IEEE"
+                    className="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 font-medium transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-900 font-bold mb-3">Achievement Level</label>
+                  <select
+                    name="achievementLevel"
+                    value={formData.achievementLevel}
+                    onChange={handleChange}
+                    className="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 font-medium bg-white cursor-pointer transition"
+                  >
+                    <option>College</option>
+                    <option>University</option>
+                    <option>State</option>
+                    <option>National</option>
+                    <option>International</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* File Upload */}
+              <div>
+                <label className="block text-gray-900 font-bold mb-3">Proof Document (Optional)</label>
+                <div
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  className={`border-2 border-dashed rounded-2xl p-8 text-center transition duration-300 cursor-pointer group ${
+                    dragActive
+                      ? 'border-orange-500 bg-orange-50'
+                      : 'border-gray-300 bg-gray-50 hover:border-orange-400 hover:bg-orange-50/50'
+                  }`}
+                >
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="file-input"
+                    accept=".pdf,.jpg,.png,.jpeg"
+                  />
+                  <label htmlFor="file-input" className="cursor-pointer block">
+                    {file ? (
+                      <div className="flex items-center justify-center gap-3">
+                        <CheckCircle2 size={32} className="text-green-600" />
+                        <div className="text-left">
+                          <p className="text-green-700 font-bold text-lg">{file.name}</p>
+                          <p className="text-sm text-green-600 font-medium">Click to change file</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <Upload size={40} className="mx-auto text-orange-500 mb-3 group-hover:scale-110 transition" />
+                        <p className="text-gray-900 font-bold text-lg">Click to upload or drag & drop</p>
+                        <p className="text-sm text-gray-600 font-medium mt-2">PDF, JPG, PNG (max 10MB)</p>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Skills Selection Section */}
+          <div className="bg-white p-8 rounded-2xl border-2 border-gray-100 shadow-lg hover:shadow-xl transition duration-300">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="bg-gradient-to-br from-orange-600 to-orange-500 p-3 rounded-lg">
+                <Loader size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Select Your Skills</h2>
+                <p className="text-gray-600 font-medium text-sm mt-1">Choose all skills that apply to this achievement</p>
+              </div>
+            </div>
+
+            <div className="bg-orange-50/50 border-2 border-orange-200 rounded-xl p-6 mb-6">
+              <p className="text-orange-900 font-semibold text-sm">
+                ✨ Selecting relevant skills helps institutions evaluate your qualifications and verify achievements more accurately.
+              </p>
+            </div>
+
+            <SkillSelector selectedSkills={selectedSkills} setSelectedSkills={setSelectedSkills} />
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex gap-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 disabled:from-gray-400 disabled:to-gray-400 text-white py-4 rounded-xl font-bold text-lg transition duration-300 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 disabled:shadow-none flex items-center justify-center gap-3 group"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin">
+                    <Loader size={20} />
+                  </div>
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Upload size={20} className="group-hover:scale-110 transition" />
+                  Submit Achievement for Verification
+                </>
+              )}
+            </button>
+            
+            <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="px-8 py-4 border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 font-bold rounded-xl transition duration-300"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Animations */}
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeInUp { animation: fadeInUp 0.5s ease-out; }
+      `}</style>
+    </div>
+  );
+}
