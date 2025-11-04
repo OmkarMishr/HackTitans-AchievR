@@ -197,9 +197,9 @@ export default function Register() {
                   onChange={handleChange}
                   className="w-full px-5 py-3 border-2 border-gray-200 rounded-xl text-gray-900 font-medium focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition duration-300 bg-white cursor-pointer"
                 >
-                  <option value="student">👨‍🎓 Student</option>
-                  <option value="faculty">👨‍🏫 Faculty</option>
-                  <option value="admin">⚙️ Administrator</option>
+                  <option value="student"> Student</option>
+                  <option value="faculty"> Faculty</option>
+                  <option value="admin">Administrator</option>
                 </select>
               </div>
 
