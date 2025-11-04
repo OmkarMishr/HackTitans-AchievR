@@ -1,10 +1,10 @@
-// routes/activities.js
 const express = require('express');
 const multer = require('multer');
 const Activity = require('../models/Activity');
 const FraudDetection = require('../models/FraudDetection');
 const StudentSkills = require('../models/StudentSkills');
 const User = require('../models/User');
+const authMiddleware = require('../middleware/auth');
 const { detectCertificateFraud } = require('../utils/aiService');
 const { sendActivityApprovedEmail, sendActivityRejectedEmail } = require('../utils/emailService');
 
@@ -12,8 +12,8 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// ===== SUBMIT ACTIVITY =====
-router.post('/submit', upload.single('document'), async (req, res) => {
+// ========== SUBMIT ACTIVITY ==========
+router.post('/submit', authMiddleware, upload.single('document'), async (req, res) => {
   try {
     const {
       title,
@@ -63,7 +63,7 @@ router.post('/submit', upload.single('document'), async (req, res) => {
     await activity.save();
     console.log('✅ Activity saved:', activity._id);
 
-    // ===== AI FRAUD DETECTION (if document uploaded) =====
+    // ========== AI FRAUD DETECTION (if document uploaded) ==========
     if (req.file) {
       try {
         console.log('🔍 Scanning document for fraud...');
@@ -96,7 +96,7 @@ router.post('/submit', upload.single('document'), async (req, res) => {
       }
     }
 
-    // ===== UPDATE STUDENT SKILLS PROFILE =====
+    // ========== UPDATE STUDENT SKILLS PROFILE ==========
     try {
       console.log('📊 Updating student skills...');
       let studentSkills = await StudentSkills.findOne({ student: studentId });
@@ -169,44 +169,64 @@ router.post('/submit', upload.single('document'), async (req, res) => {
   }
 });
 
-// ===== GET MY ACTIVITIES =====
-router.get('/my-activities', async (req, res) => {
+// ========== GET MY ACTIVITIES ==========
+router.get('/my-activities', authMiddleware, async (req, res) => {
   try {
+    console.log(`📋 Fetching activities for student: ${req.user.userId}`);
+
     const activities = await Activity.find({ student: req.user.userId })
-      .populate('reviewedBy', 'name')
-      .populate('certifiedBy', 'name')
+      .populate('student', 'name email rollNumber')
+      .populate('reviewedBy', 'name email')
+      // ❌ REMOVED .populate('certifiedBy', 'name')
       .sort({ submittedAt: -1 });
 
-    res.json({ success: true, activities });
+    console.log(`✅ Found ${activities.length} activities`);
+
+    res.json({
+      success: true,
+      total: activities.length,
+      activities
+    });
   } catch (error) {
     console.error('❌ Get my activities error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// ===== FACULTY: GET PENDING ACTIVITIES =====
-router.get('/faculty/pending', async (req, res) => {
+// ========== FACULTY: GET PENDING ACTIVITIES ==========
+router.get('/faculty/pending', authMiddleware, async (req, res) => {
   try {
+    console.log('📋 Fetching pending activities...');
+
     const activities = await Activity.find({ status: 'pending' })
       .populate('student', 'name rollNumber department email')
       .sort({ submittedAt: -1 });
 
-    res.json({ success: true, activities });
+    console.log(`✅ Found ${activities.length} pending activities`);
+
+    res.json({
+      success: true,
+      total: activities.length,
+      activities
+    });
   } catch (error) {
     console.error('❌ Get pending activities error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// ===== FACULTY: APPROVE ACTIVITY =====
-router.put('/:id/approve', async (req, res) => {
+// ========== FACULTY: APPROVE ACTIVITY ==========
+router.put('/:id/approve', authMiddleware, async (req, res) => {
   try {
     const { comment } = req.body;
     const activityId = req.params.id;
 
-    console.log('🔍 DEBUG: Approving activity:', activityId);
-    console.log('🔍 DEBUG: Comment:', comment);
-    console.log('🔍 DEBUG: User ID:', req.user?.userId);
+    console.log('\n' + '='.repeat(70));
+    console.log('✅ APPROVING ACTIVITY');
+    console.log('='.repeat(70));
+    console.log('🔍 Activity ID:', activityId);
+    console.log('🔍 Faculty ID:', req.user?.userId);
+    console.log('📝 Comment:', comment);
 
     if (!activityId) {
       return res.status(400).json({ error: 'Activity ID is required' });
@@ -229,26 +249,30 @@ router.put('/:id/approve', async (req, res) => {
       { new: true }
     ).populate('student', 'name email rollNumber department');
 
-    console.log('🔍 DEBUG: Activity found:', !!activity);
+    console.log('🔍 Activity found:', !!activity);
 
     if (!activity) {
+      console.error('❌ Activity not found');
       return res.status(404).json({ error: 'Activity not found' });
     }
 
-    console.log('🔍 DEBUG: Student data:', {
+    console.log('✅ Activity updated in DB');
+    console.log('🔍 Student:', {
       name: activity.student?.name,
       email: activity.student?.email
     });
 
     if (!activity.student) {
+      console.error('❌ Student data not found');
       return res.status(400).json({ error: 'Student data not found' });
     }
 
     if (!activity.student.email) {
+      console.error('❌ Student email not found');
       return res.status(400).json({ error: 'Student email not found' });
     }
 
-    // Send approval email
+    // ========== SEND APPROVAL EMAIL ==========
     try {
       console.log('📧 Sending approval email to:', activity.student.email);
       
@@ -260,12 +284,14 @@ router.put('/:id/approve', async (req, res) => {
       }
     } catch (emailError) {
       console.error('⚠️ Email error (activity still approved):', emailError.message);
-      // Don't fail the entire request - activity is already approved
     }
+
+    console.log('='.repeat(70));
+    console.log('🎉 SUCCESS!\n');
 
     res.json({
       success: true,
-      message: '✅ Activity approved!',
+      message: '✅ Activity approved and email sent!',
       activity: {
         id: activity._id,
         title: activity.title,
@@ -278,6 +304,7 @@ router.put('/:id/approve', async (req, res) => {
   } catch (error) {
     console.error('❌ APPROVE ERROR:', error.message);
     console.error('Stack:', error.stack);
+    console.log('='.repeat(70) + '\n');
     
     res.status(500).json({
       error: error.message,
@@ -286,14 +313,18 @@ router.put('/:id/approve', async (req, res) => {
   }
 });
 
-// ===== FACULTY: REJECT ACTIVITY =====
-router.put('/:id/reject', async (req, res) => {
+// ========== FACULTY: REJECT ACTIVITY ==========
+router.put('/:id/reject', authMiddleware, async (req, res) => {
   try {
     const { reason } = req.body;
     const activityId = req.params.id;
 
-    console.log('🔍 DEBUG: Rejecting activity:', activityId);
-    console.log('🔍 DEBUG: Reason:', reason);
+    console.log('\n' + '='.repeat(70));
+    console.log('❌ REJECTING ACTIVITY');
+    console.log('='.repeat(70));
+    console.log('🔍 Activity ID:', activityId);
+    console.log('🔍 Faculty ID:', req.user?.userId);
+    console.log('📝 Reason:', reason);
 
     if (!activityId) {
       return res.status(400).json({ error: 'Activity ID is required' });
@@ -314,13 +345,16 @@ router.put('/:id/reject', async (req, res) => {
       { new: true }
     ).populate('student', 'name email rollNumber');
 
-    console.log('🔍 DEBUG: Activity found:', !!activity);
+    console.log('🔍 Activity found:', !!activity);
 
     if (!activity) {
+      console.error('❌ Activity not found');
       return res.status(404).json({ error: 'Activity not found' });
     }
 
-    // Send rejection email
+    console.log('✅ Activity updated in DB');
+
+    // ========== SEND REJECTION EMAIL ==========
     try {
       console.log('📧 Sending rejection email to:', activity.student?.email);
       
@@ -334,9 +368,12 @@ router.put('/:id/reject', async (req, res) => {
       console.error('⚠️ Rejection email error:', emailError.message);
     }
 
+    console.log('='.repeat(70));
+    console.log('🎉 SUCCESS!\n');
+
     res.json({
       success: true,
-      message: '❌ Activity rejected',
+      message: '❌ Activity rejected and email sent',
       activity: {
         id: activity._id,
         title: activity.title,
@@ -347,37 +384,91 @@ router.put('/:id/reject', async (req, res) => {
 
   } catch (error) {
     console.error('❌ REJECT ERROR:', error.message);
+    console.log('='.repeat(70) + '\n');
+    
     res.status(500).json({ error: error.message });
   }
 });
 
-// ===== ADMIN: GET APPROVED ACTIVITIES =====
-router.get('/admin/approved', async (req, res) => {
+// ========== ADMIN: GET APPROVED ACTIVITIES ==========
+router.get('/admin/approved', authMiddleware, async (req, res) => {
   try {
+    console.log('📋 Fetching approved activities...');
+
+    // Check if user is admin
+    const user = await User.findById(req.user.userId);
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: 'Only admin can access this' });
+    }
+
     const activities = await Activity.find({ status: 'approved' })
       .populate('student', 'name rollNumber email department')
-      .populate('reviewedBy', 'name')
+      .populate('reviewedBy', 'name email')
       .sort({ reviewedAt: -1 });
 
-    res.json({ success: true, activities });
+    console.log(`✅ Found ${activities.length} approved activities`);
+
+    res.json({
+      success: true,
+      total: activities.length,
+      activities
+    });
   } catch (error) {
     console.error('❌ Get approved activities error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// ===== GET ACTIVITY DETAILS =====
+// ========== ADMIN: GET ALL ACTIVITIES ==========
+router.get('/admin/all', authMiddleware, async (req, res) => {
+  try {
+    console.log('📋 Fetching all activities...');
+
+    // Check if user is admin
+    const user = await User.findById(req.user.userId);
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: 'Only admin can access this' });
+    }
+
+    const activities = await Activity.find()
+      .populate('student', 'name rollNumber email department')
+      .populate('reviewedBy', 'name email')
+      .sort({ createdAt: -1 });
+
+    console.log(`✅ Found ${activities.length} activities`);
+
+    res.json({
+      success: true,
+      total: activities.length,
+      activities
+    });
+  } catch (error) {
+    console.error('❌ Get all activities error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ========== GET ACTIVITY DETAILS ==========
 router.get('/:id', async (req, res) => {
   try {
+    console.log(`📋 Fetching activity: ${req.params.id}`);
+
     const activity = await Activity.findById(req.params.id)
       .populate('student', 'name email rollNumber')
+      .populate('reviewedBy', 'name email')
       .populate('fraudDetectionId');
 
     if (!activity) {
+      console.error('❌ Activity not found');
       return res.status(404).json({ error: 'Activity not found' });
     }
 
-    res.json({ success: true, activity });
+    console.log('✅ Activity found');
+
+    res.json({
+      success: true,
+      activity
+    });
   } catch (error) {
     console.error('❌ Get activity error:', error);
     res.status(500).json({ error: error.message });
