@@ -181,6 +181,7 @@ export default function SkillSelector({ selectedSkills, setSelectedSkills }) {
       {renderSkillCategory(
         'technicalSkills',
         'Technical Skills',
+        '',
         'text-blue-600',
         'bg-blue-50',
         'border-blue-500'
@@ -190,6 +191,7 @@ export default function SkillSelector({ selectedSkills, setSelectedSkills }) {
       {renderSkillCategory(
         'softSkills',
         'Soft Skills',
+        '',
         'text-purple-600',
         'bg-purple-50',
         'border-purple-500'
@@ -199,6 +201,7 @@ export default function SkillSelector({ selectedSkills, setSelectedSkills }) {
       {renderSkillCategory(
         'tools',
         'Tools & Platforms',
+        '',
         'text-orange-600',
         'bg-orange-50',
         'border-orange-500'
