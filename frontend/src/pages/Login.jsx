@@ -50,7 +50,7 @@ export default function Login({ setUser }) {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-orange-50/30 to-white overflow-hidden relative font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-white via-orange-50/30 to-white overflow-hidden relative ">
       
       {/* Animated Background Blobs */}
       <motion.div

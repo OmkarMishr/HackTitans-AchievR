@@ -29,12 +29,13 @@ mongoose.connect(process.env.MONGODB_URI, {
 // ===== 4. ROUTES (PUBLIC FIRST, THEN PROTECTED) =====
 // Public routes (no auth required)
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/verify', require('./routes/verify')); // QR verification can be public
+app.use('/api/verify', require('./routes/verify'));
+app.use('/api/recruiter', require('./routes/recruiter')); // Add this line
 
 // Protected routes (auth required)
 app.use('/api/activities', authMiddleware, require('./routes/activities'));
 app.use('/api/certificates', authMiddleware, require('./routes/certificates'));
-app.use('/api/recruiter', authMiddleware, require('./routes/recruiter'));
+
 
 app.use('/api/certificates', certificateRoutes);
 // Health check

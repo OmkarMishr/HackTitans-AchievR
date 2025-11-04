@@ -29,7 +29,7 @@ router.post('/submit', upload.single('document'), async (req, res) => {
 
     const studentId = req.user.userId;
 
-    console.log('📝 Creating activity for student:', studentId);
+    console.log(' Creating activity for student:', studentId);
 
     // Parse skill arrays from JSON strings
     const techSkills = JSON.parse(selectedTechnicalSkills || '[]');
@@ -61,12 +61,12 @@ router.post('/submit', upload.single('document'), async (req, res) => {
     });
 
     await activity.save();
-    console.log('✅ Activity saved:', activity._id);
+    console.log('Activity saved:', activity._id);
 
     // ===== AI FRAUD DETECTION (if document uploaded) =====
     if (req.file) {
       try {
-        console.log('🔍 Scanning document for fraud...');
+        console.log(' Scanning document for fraud...');
         const fraud = await detectCertificateFraud(req.file.buffer);
 
         const fraudDetection = new FraudDetection({
@@ -85,21 +85,21 @@ router.post('/submit', upload.single('document'), async (req, res) => {
         if (fraud.recommendation === 'auto_reject') {
           activity.status = 'rejected';
           activity.rejectionReason = `Fraud detected (Score: ${fraud.fraudScore}/100)`;
-          console.warn('⚠️ Activity auto-rejected due to fraud');
+          console.warn(' Activity auto-rejected due to fraud');
         } else {
-          console.log('✅ Fraud check passed');
+          console.log(' Fraud check passed');
         }
 
         await activity.save();
       } catch (fraudError) {
-        console.error('⚠️ Fraud detection error:', fraudError.message);
+        console.error(' Fraud detection error:', fraudError.message);
         // Continue even if fraud detection fails
       }
     }
 
     // ===== UPDATE STUDENT SKILLS PROFILE =====
     try {
-      console.log('📊 Updating student skills...');
+      console.log(' Updating student skills...');
       let studentSkills = await StudentSkills.findOne({ student: studentId });
       
       if (!studentSkills) {
@@ -145,9 +145,9 @@ router.post('/submit', upload.single('document'), async (req, res) => {
       studentSkills.lastUpdated = new Date();
 
       await studentSkills.save();
-      console.log('✅ Skills updated');
+      console.log(' Skills updated');
     } catch (skillsError) {
-      console.error('⚠️ Skills update error:', skillsError.message);
+      console.error(' Skills update error:', skillsError.message);
       // Continue even if skills update fails
     }
 
@@ -166,7 +166,7 @@ router.post('/submit', upload.single('document'), async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Submit activity error:', error);
+    console.error(' Submit activity error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -181,7 +181,7 @@ router.get('/my-activities', async (req, res) => {
 
     res.json({ success: true, activities });
   } catch (error) {
-    console.error('❌ Get my activities error:', error);
+    console.error(' Get my activities error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -195,7 +195,7 @@ router.get('/faculty/pending', async (req, res) => {
 
     res.json({ success: true, activities });
   } catch (error) {
-    console.error('❌ Get pending activities error:', error);
+    console.error(' Get pending activities error:', error);
     res.status(500).json({ error: error.message });
   }
 });
