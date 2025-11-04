@@ -1,4 +1,3 @@
-// pages/FacultyDashboard.jsx
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
@@ -30,34 +29,27 @@ export default function FacultyDashboard() {
         return;
       }
 
-      console.log('Fetching pending activities...');
-      
       const response = await axios.get('http://localhost:5000/api/activities/faculty/pending', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      console.log(' Activities fetched:', response.data.activities.length);
       setActivities(response.data.activities || []);
     } catch (error) {
-      console.error(' Error fetching activities:', error.message);
+      console.error('Error fetching activities:', error.message);
       setError(error.response?.data?.error || 'Failed to load activities');
     } finally {
       setLoading(false);
     }
   };
 
-  // ========== APPROVE ACTIVITY ==========
   const handleApprove = async (activityId) => {
-    console.log(' DEBUG: Activity ID:', activityId);
-    console.log(' DEBUG: Type:', typeof activityId);
-    
     if (!activityId) {
-      alert(' Activity ID is missing');
+      alert('Activity ID is missing');
       return;
     }
 
     if (!comment.trim()) {
-      alert(' Please add a comment before approving');
+      alert('Please add a comment before approving');
       return;
     }
 
@@ -65,43 +57,36 @@ export default function FacultyDashboard() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert(' Authentication token missing. Please login again.');
+        alert('Authentication token missing. Please login again.');
         return;
       }
 
-      console.log(' Approving activity:', activityId);
-      
-      // CORRECT ENDPOINT
       const response = await axios.put(
         `http://localhost:5000/api/activities/${activityId}/approve`,
         { comment },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log(' Activity approved:', response.data);
-      alert(' Activity approved successfully!');
+      alert('Activity approved successfully!');
       setSelectedActivity(null);
       setComment('');
       await fetchPendingActivities();
     } catch (error) {
-      console.error(' Error approving activity:', error.response?.data || error.message);
-      alert(` Error: ${error.response?.data?.error || error.message}`);
+      console.error('Error approving activity:', error.message);
+      alert(`Error: ${error.response?.data?.error || error.message}`);
     } finally {
       setActionLoading(false);
     }
   };
 
-  // ========== REJECT ACTIVITY ==========
   const handleReject = async (activityId, reason) => {
-    console.log('🔍 DEBUG: Reject Activity ID:', activityId);
-    
     if (!activityId) {
-      alert(' Activity ID is missing');
+      alert('Activity ID is missing');
       return;
     }
 
     if (!reason.trim()) {
-      alert(' Please add a rejection reason');
+      alert('Please add a rejection reason');
       return;
     }
 
@@ -109,35 +94,30 @@ export default function FacultyDashboard() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert(' Authentication token missing. Please login again.');
+        alert('Authentication token missing. Please login again.');
         return;
       }
 
-      console.log(' Rejecting activity:', activityId);
-      
-      //  CORRECT ENDPOINT
       const response = await axios.put(
         `http://localhost:5000/api/activities/${activityId}/reject`,
         { reason },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log(' Activity rejected:', response.data);
-      alert(' Activity rejected!');
+      alert('Activity rejected!');
       setSelectedActivity(null);
       await fetchPendingActivities();
     } catch (error) {
-      console.error(' Error rejecting activity:', error.response?.data || error.message);
-      alert(` Error: ${error.response?.data?.error || error.message}`);
+      console.error('Error rejecting activity:', error.message);
+      alert(`Error: ${error.response?.data?.error || error.message}`);
     } finally {
       setActionLoading(false);
     }
   };
 
-  // ========== GENERATE CERTIFICATE ==========
   const handleGenerateCertificate = async (activityId) => {
     if (!activityId) {
-      alert(' Activity ID is missing');
+      alert('Activity ID is missing');
       return;
     }
 
@@ -145,20 +125,17 @@ export default function FacultyDashboard() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert(' Authentication token missing. Please login again.');
+        alert('Authentication token missing. Please login again.');
         return;
       }
 
-      console.log(' Generating certificate with QR code...');
-      
       const response = await axios.post(
         `http://localhost:5000/api/certificates/generate/${activityId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log(' Certificate generated:', response.data);
-      alert(' Certificate with QR code generated successfully!');
+      alert('Certificate with QR code generated successfully!');
       
       setSelectedActivity(prev => ({
         ...prev,
@@ -168,21 +145,19 @@ export default function FacultyDashboard() {
 
       await fetchPendingActivities();
     } catch (error) {
-      console.error('❌ Error generating certificate:', error.response?.data || error.message);
-      alert(`❌ Error: ${error.response?.data?.error || error.message}`);
+      console.error('Error generating certificate:', error.message);
+      alert(`Error: ${error.response?.data?.error || error.message}`);
     } finally {
       setGeneratingCert(false);
     }
   };
 
-  // ========== DOWNLOAD CERTIFICATE ==========
   const handleDownloadCertificate = (certificateId) => {
     window.location.href = `http://localhost:5000/api/certificates/download/${certificateId}`;
   };
 
-  // ========== VIEW CERTIFICATE ==========
   const handleViewCertificate = (certificateId) => {
-    window.open(`http://localhost:5000/api/certificates/view/${certificateId}`, '_blank');
+    window.open(`http://localhost:3000/verify/${certificateId}`, '_blank');
   };
 
   if (loading) {
@@ -199,7 +174,6 @@ export default function FacultyDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 font-sans">
       <div className="max-w-7xl mx-auto px-8 py-12">
-        {/* Header Section */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
             <div>
@@ -209,7 +183,6 @@ export default function FacultyDashboard() {
           </div>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="mb-8 bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
@@ -223,7 +196,6 @@ export default function FacultyDashboard() {
           </div>
         )}
 
-        {/* Stats Card */}
         <div className="mb-8">
           <div className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-orange-400 transition duration-300 shadow-lg">
             <div className="flex items-center justify-between">
@@ -243,9 +215,7 @@ export default function FacultyDashboard() {
           </div>
         </div>
 
-        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Activities List */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center gap-3 mb-4">
               <FileText className="w-6 h-6 text-orange-600" />
@@ -270,7 +240,7 @@ export default function FacultyDashboard() {
                       setComment('');
                     }}
                     className={`bg-white p-6 border-2 rounded-xl cursor-pointer transition duration-300 hover:shadow-lg ${
-                      selectedActivity?._id === activity._id  // ✅ USE _id NOT id
+                      selectedActivity?._id === activity._id
                         ? 'border-orange-400 bg-orange-50 shadow-lg'
                         : 'border-gray-200 hover:border-orange-300'
                     }`}
@@ -294,7 +264,7 @@ export default function FacultyDashboard() {
                           </div>
                         </div>
                       </div>
-                      {selectedActivity?._id === activity._id && (  // ✅ USE _id NOT id
+                      {selectedActivity?._id === activity._id && (
                         <span className="px-3 py-1 bg-gradient-to-r from-orange-600 to-orange-500 text-white text-xs font-medium rounded-full">
                           Selected
                         </span>
@@ -322,7 +292,6 @@ export default function FacultyDashboard() {
             )}
           </div>
 
-          {/* Review Panel */}
           <div className="space-y-6">
             {selectedActivity ? (
               <>
@@ -332,7 +301,7 @@ export default function FacultyDashboard() {
                 </div>
 
                 <div className="space-y-4">
-                  {/* Activity Details Cards */}
+                  {/* Activity Details */}
                   <div className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-orange-400 transition duration-300">
                     <div className="space-y-4">
                       <div>
@@ -371,6 +340,94 @@ export default function FacultyDashboard() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Proof Documents Section */}
+                  {selectedActivity?.proofDocuments && Array.isArray(selectedActivity.proofDocuments) && selectedActivity.proofDocuments.length > 0 ? (
+                    <div className="bg-white border-2 border-blue-200 rounded-xl p-6 hover:border-blue-400 transition duration-300 bg-blue-50">
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 mb-3">
+                          <FileText className="w-5 h-5 text-blue-600" />
+                          <p className="text-sm font-semibold text-blue-900 uppercase tracking-wider">
+                            📎 Proof Documents ({selectedActivity.proofDocuments.length})
+                          </p>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          {selectedActivity.proofDocuments.map((doc, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center justify-between p-4 bg-white border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:shadow-md transition"
+                            >
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                                  <FileText className="w-5 h-5 text-blue-600" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-gray-900 truncate">
+                                    {doc.filename || `Document ${index + 1}`}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    Uploaded: {doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString() : 'N/A'}
+                                  </p>
+                                  {doc.fileSize && (
+                                    <p className="text-xs text-gray-500">
+                                      Size: {(doc.fileSize / 1024).toFixed(2)} KB
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-2 ml-4">
+                                <button
+                                  onClick={() => {
+                                    const url = doc.url || doc.path;
+                                    if (url) {
+                                      const fullUrl = url.startsWith('http') 
+                                        ? url 
+                                        : `http://localhost:5000${url.startsWith('/') ? url : '/' + url}`;
+                                      window.open(fullUrl, '_blank');
+                                    } else {
+                                      alert('Document URL not available');
+                                    }
+                                  }}
+                                  className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                                  title="View Document"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                  View
+                                </button>
+                                
+                                <button
+                                  onClick={() => {
+                                    const url = doc.url || doc.path;
+                                    if (url) {
+                                      const fullUrl = url.startsWith('http') 
+                                        ? url 
+                                        : `http://localhost:5000${url.startsWith('/') ? url : '/' + url}`;
+                                      window.location.href = fullUrl;
+                                    } else {
+                                      alert('Document URL not available');
+                                    }
+                                  }}
+                                  className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
+                                  title="Download Document"
+                                >
+                                  <Download className="w-4 h-4" />
+                                  Download
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <div className="mt-3 p-3 bg-blue-100 rounded-lg">
+                          <p className="text-xs text-blue-700 font-medium">
+                            ℹ️ Review these proof documents before approving the activity
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
 
                   {/* Skills Section */}
                   {(selectedActivity.selectedTechnicalSkills?.length > 0 || 
@@ -462,7 +519,7 @@ export default function FacultyDashboard() {
                           </>
                         ) : (
                           <button
-                            onClick={() => handleGenerateCertificate(selectedActivity._id)}  // ✅ USE _id NOT id
+                            onClick={() => handleGenerateCertificate(selectedActivity._id)}
                             disabled={generatingCert}
                             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-lg hover:from-purple-700 hover:to-purple-600 disabled:from-gray-400 disabled:to-gray-400 transition text-sm font-medium"
                           >
@@ -483,7 +540,6 @@ export default function FacultyDashboard() {
                     </div>
                   ) : (
                     <>
-                      {/* Review Comment */}
                       <div className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-orange-400 transition duration-300">
                         <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">Review Comment *</p>
                         <textarea
@@ -494,10 +550,9 @@ export default function FacultyDashboard() {
                         />
                       </div>
 
-                      {/* Action Buttons */}
                       <div className="space-y-3">
                         <button
-                          onClick={() => handleApprove(selectedActivity._id)}  // ✅ USE _id NOT id
+                          onClick={() => handleApprove(selectedActivity._id)}
                           disabled={actionLoading || !comment.trim()}
                           className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:from-orange-700 hover:to-orange-600 disabled:from-gray-400 disabled:to-gray-400 transition duration-300 font-medium text-sm shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 disabled:shadow-none rounded-xl"
                         >
@@ -517,7 +572,7 @@ export default function FacultyDashboard() {
                         <button
                           onClick={() => {
                             const reason = prompt('Enter rejection reason:');
-                            if (reason) handleReject(selectedActivity._id, reason);  // ✅ USE _id NOT id
+                            if (reason) handleReject(selectedActivity._id, reason);
                           }}
                           disabled={actionLoading}
                           className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 hover:border-red-500 hover:text-red-600 hover:bg-red-50 disabled:border-gray-300 disabled:text-gray-400 disabled:bg-gray-100 transition duration-300 font-medium text-sm rounded-xl"

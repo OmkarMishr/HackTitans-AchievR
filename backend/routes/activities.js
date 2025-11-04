@@ -1,5 +1,7 @@
 const express = require('express');
 const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 const Activity = require('../models/Activity');
 const FraudDetection = require('../models/FraudDetection');
 const StudentSkills = require('../models/StudentSkills');
@@ -9,8 +11,17 @@ const { detectCertificateFraud } = require('../utils/aiService');
 const { sendActivityApprovedEmail, sendActivityRejectedEmail } = require('../utils/emailService');
 
 const router = express.Router();
+
+// ✅ USE MEMORY STORAGE (will save manually)
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
+
+// ✅ CREATE UPLOADS FOLDER IF NOT EXISTS
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log('📁 Created uploads folder:', uploadDir);
+}
 
 // ========== SUBMIT ACTIVITY ==========
 router.post('/submit', authMiddleware, upload.single('document'), async (req, res) => {
@@ -29,7 +40,24 @@ router.post('/submit', authMiddleware, upload.single('document'), async (req, re
 
     const studentId = req.user.userId;
 
-    console.log('📝 Creating activity for student:', studentId);
+    console.log('\n' + '='.repeat(70));
+    console.log('📝 ACTIVITY SUBMISSION RECEIVED');
+    console.log('='.repeat(70));
+    console.log('📋 Form Data:');
+    console.log('   Title:', title);
+    console.log('   Category:', category);
+    console.log('   Student ID:', studentId);
+
+    // ✅ ADD FILE LOGGING
+    console.log('📁 FILE INFO:');
+    if (req.file) {
+      console.log('   ✅ FILE RECEIVED');
+      console.log('   Original name:', req.file.originalname);
+      console.log('   Size:', req.file.size, 'bytes');
+      console.log('   Type:', req.file.mimetype);
+    } else {
+      console.log('   ⚠️ NO FILE UPLOADED (Optional)');
+    }
 
     // Parse skill arrays from JSON strings
     const techSkills = JSON.parse(selectedTechnicalSkills || '[]');
@@ -38,6 +66,33 @@ router.post('/submit', authMiddleware, upload.single('document'), async (req, re
 
     if (techSkills.length === 0 && softSkills.length === 0 && tools.length === 0) {
       return res.status(400).json({ error: 'Please select at least one skill' });
+    }
+
+    // ✅ FIX: SAVE FILE TO DISK
+    let proofDocuments = [];
+    if (req.file) {
+      try {
+        const filename = `${Date.now()}-${req.file.originalname}`;
+        const filepath = `/uploads/${filename}`;
+        const fullPath = path.join(uploadDir, filename);
+        
+        // Write file to disk
+        fs.writeFileSync(fullPath, req.file.buffer);
+        console.log('💾 File saved:', fullPath);
+        
+        proofDocuments = [{
+          filename: filename,
+          originalname: req.file.originalname,
+          path: filepath,
+          url: filepath,
+          fileSize: req.file.size,
+          fileType: req.file.mimetype,
+          uploadedAt: new Date()
+        }];
+      } catch (fileError) {
+        console.error('❌ File save error:', fileError.message);
+        return res.status(500).json({ error: 'File upload failed: ' + fileError.message });
+      }
     }
 
     const activity = new Activity({
@@ -53,15 +108,12 @@ router.post('/submit', authMiddleware, upload.single('document'), async (req, re
       selectedTools: tools,
       status: 'pending',
       submittedAt: new Date(),
-      proofDocuments: req.file ? [{
-        filename: req.file.originalname,
-        url: `/uploads/${Date.now()}-${req.file.originalname}`,
-        uploadedAt: new Date()
-      }] : []
+      proofDocuments: proofDocuments
     });
 
     await activity.save();
     console.log('✅ Activity saved:', activity._id);
+    console.log('📄 Proof documents count:', activity.proofDocuments.length);
 
     // ========== AI FRAUD DETECTION (if document uploaded) ==========
     if (req.file) {
@@ -149,6 +201,8 @@ router.post('/submit', authMiddleware, upload.single('document'), async (req, re
       console.error('⚠️ Skills update error:', skillsError.message);
     }
 
+    console.log('='.repeat(70) + '\n');
+
     res.json({
       success: true,
       message: 'Activity submitted successfully!',
@@ -157,6 +211,7 @@ router.post('/submit', authMiddleware, upload.single('document'), async (req, re
         title,
         status: activity.status,
         fraudStatus: activity.fraudStatus,
+        fileUploaded: !!req.file,
         selectedTechnicalSkills: techSkills,
         selectedSoftSkills: softSkills,
         selectedTools: tools
@@ -165,6 +220,7 @@ router.post('/submit', authMiddleware, upload.single('document'), async (req, re
 
   } catch (error) {
     console.error('❌ Submit activity error:', error);
+    console.log('='.repeat(70) + '\n');
     res.status(500).json({ error: error.message });
   }
 });
@@ -177,7 +233,6 @@ router.get('/my-activities', authMiddleware, async (req, res) => {
     const activities = await Activity.find({ student: req.user.userId })
       .populate('student', 'name email rollNumber')
       .populate('reviewedBy', 'name email')
-      // ❌ REMOVED .populate('certifiedBy', 'name')
       .sort({ submittedAt: -1 });
 
     console.log(`✅ Found ${activities.length} activities`);
