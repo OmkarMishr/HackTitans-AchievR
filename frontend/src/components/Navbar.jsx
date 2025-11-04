@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Plus, FileCheck, Shield } from 'lucide-react';
+import achievrLogo from '../assets/achievr-logo.png';
 
 export default function Navbar({ user, setUser }) {
   const navigate = useNavigate();
@@ -17,10 +18,14 @@ export default function Navbar({ user, setUser }) {
         <div className="flex justify-between items-center">
           {/* Logo/Brand */}
           <div 
-            className="text-xl font-light text-gray-900 cursor-pointer hover:text-orange-600 transition duration-300 flex items-center gap-2"
-            onClick={() => navigate(user.role === 'student' ? '/dashboard' : `/${user.role}`)}
+            className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition duration-300"
+            
           >
-            <span className="font-semibold">ACHIEVR</span>
+            <img 
+              src={achievrLogo} 
+              alt="AchievR Logo" 
+              className="h-18 w-auto hover:scale-105 transition duration-300"
+            />
           </div>
 
           {/* Right Side Actions */}

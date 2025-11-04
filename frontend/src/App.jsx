@@ -9,6 +9,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import SubmitActivity from './pages/SubmitActivity';
 import PublicVerify from './pages/PublicVerify';
 import StudentProfile from './pages/StudentProfile';
+import RecruiterView from './pages/RecruiterView'; // Add this
 import Navbar from './components/Navbar';
 
 export default function App() {
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="/login" element={user ? <Navigate to={user.role === 'student' ? '/dashboard' : `/${user.role}`} /> : <Login setUser={setUser} />} />
         <Route path="/register" element={user ? <Navigate to={user.role === 'student' ? '/dashboard' : `/${user.role}`} /> : <Register />} />
         <Route path="/verify/:hash" element={<PublicVerify />} />
+        <Route path="/recruiter-view/:studentId" element={<RecruiterView />} /> {/* Add this */}
         
         {/* Protected Routes - Student */}
         {user?.role === 'student' && (

@@ -34,7 +34,7 @@ export default function PremiumAchievRLanding({ user, setUser }) {
   };
 
   return (
-    <div className="bg-white text-gray-900 overflow-hidden">
+    <div className="bg-white text-gray-900 overflow-hidden font-sans">
 
       {/* Navigation */}
       <nav className="fixed w-full z-50 backdrop-blur-md bg-white/80 border-b border-gray-200">

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { Plus, Download, TrendingUp, Award, Clock, AlertCircle, Zap, GraduationCap } from 'lucide-react';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Plus, Download, TrendingUp, Award, Clock, AlertCircle, Zap, GraduationCap, Share2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-export default function StudentDashboard() {
+export default function StudentDashboard({ user }) {
   const [activities, setActivities] = useState([]);
   const [stats, setStats] = useState({
     total: 0,
@@ -43,8 +44,33 @@ export default function StudentDashboard() {
       });
     } catch (error) {
       console.error('Error fetching activities:', error);
+      toast.error('Failed to load activities');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSharePortfolio = async () => {
+    try {
+      const shareLink = `${window.location.origin}/recruiter-view/${user?.id}`;
+      
+      // Try to use native share API
+      if (navigator.share) {
+        await navigator.share({
+          title: `${user?.name}'s Achievement Portfolio`,
+          text: `Check out ${user?.name}'s verified achievements and skills on AchievR`,
+          url: shareLink,
+        });
+        toast.success('Portfolio shared successfully!');
+      } else {
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(shareLink);
+        toast.success('Shareable link copied to clipboard!');
+      }
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        toast.error('Failed to share portfolio');
+      }
     }
   };
 
@@ -78,26 +104,42 @@ export default function StudentDashboard() {
   const certificationRate = stats.total > 0 ? Math.round((stats.certified / stats.total) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-orange-50/20 to-white pt-24 pb-12">
+    <div className="min-h-screen bg-gradient-to-br from-white via-orange-50/20 to-white pt-8 pb-12">
       <div className="max-w-7xl mx-auto px-8">
-        
-        {/* Header */}
-        <div className="mb-12 flex justify-between items-start">
-          <div>
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-3">Your Achievement Portfolio</h1>
-            <p className="text-xl text-gray-600 font-medium">Track, certify, and showcase your accomplishments</p>
+
+        {/* Header Section */}
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-8">
+            <div className="flex-1">
+              <h1 className="text-3xl md:text-5xl font-light text-gray-900 mb-3">Your Achievement Portfolio</h1>
+              <p className="text-lg text-gray-600 font-light">Track, certify, and showcase your accomplishments</p>
+            </div>
+
+            {/* Buttons Section */}
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+              {/* Share Portfolio Button */}
+              <button
+                onClick={handleSharePortfolio}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-orange-600 text-orange-600 hover:bg-orange-50 font-semibold rounded-xl transition duration-300 hover:border-orange-700 hover:text-orange-700 shadow-md hover:shadow-lg"
+              >
+                <Share2 size={18} />
+                <span>Share Portfolio</span>
+              </button>
+
+              {/* Add Achievement Button */}
+              <button
+                onClick={() => navigate('/submit')}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-semibold rounded-xl transition duration-300 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105 group"
+              >
+                <Plus size={18} className="group-hover:rotate-90 transition duration-300" />
+                <span>Add Achievement</span>
+              </button>
+            </div>
           </div>
-          <button
-            onClick={() => navigate('/submit')}
-            className="hidden md:flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white font-bold rounded-xl transition duration-300 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105 group"
-          >
-            <Plus size={22} className="group-hover:rotate-90 transition duration-300" />
-            Add Achievement
-          </button>
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 mb-12">
           {/* Total Activities */}
           <div className="bg-white border-2 border-gray-100 rounded-2xl p-6 shadow-lg hover:shadow-xl hover:border-orange-400 transition duration-300 group">
             <div className="flex items-start justify-between mb-4">
@@ -176,9 +218,9 @@ export default function StudentDashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                   <XAxis dataKey="name" stroke="#6B7280" style={{ fontSize: '14px', fontWeight: '600' }} />
                   <YAxis stroke="#6B7280" style={{ fontSize: '14px', fontWeight: '600' }} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#fff', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
                       border: '2px solid #F97316',
                       borderRadius: '12px',
                       fontWeight: '600'
@@ -222,9 +264,9 @@ export default function StudentDashboard() {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#fff', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
                       border: '2px solid #F97316',
                       borderRadius: '12px',
                       fontWeight: '600'
@@ -242,7 +284,7 @@ export default function StudentDashboard() {
 
         {/* Activities Table */}
         <div className="bg-white border-2 border-gray-100 rounded-2xl shadow-lg overflow-hidden">
-          
+
           {/* Table Header */}
           <div className="p-8 border-b border-gray-100 bg-gradient-to-r from-orange-50 to-white flex justify-between items-center">
             <div>
@@ -251,7 +293,7 @@ export default function StudentDashboard() {
             </div>
             <button
               onClick={() => navigate('/submit')}
-              className="md:hidden flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-500 text-white font-bold rounded-xl transition duration-300 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50"
+              className="md:hidden inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-500 text-white font-bold rounded-xl transition duration-300 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50"
             >
               <Plus size={18} />
               Add
@@ -299,21 +341,21 @@ export default function StudentDashboard() {
                         </span>
                       </td>
                       <td className="px-8 py-6 font-medium text-gray-700">
-                        {new Date(activity.eventDate).toLocaleDateString('en-US', { 
-                          year: 'numeric', 
-                          month: 'short', 
-                          day: 'numeric' 
+                        {new Date(activity.eventDate).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
                         })}
                       </td>
                       <td className="px-8 py-6">
                         <span className={`inline-block px-4 py-2 rounded-lg text-sm font-bold transition duration-300 ${
-                          activity.status === 'certified' 
-                            ? 'bg-green-100 text-green-700' :
-                          activity.status === 'approved' 
-                            ? 'bg-blue-100 text-blue-700' :
-                          activity.status === 'pending' 
-                            ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-red-100 text-red-700'
+                          activity.status === 'certified'
+                            ? 'bg-green-100 text-green-700'
+                            : activity.status === 'approved'
+                            ? 'bg-blue-100 text-blue-700'
+                            : activity.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-700'
+                            : 'bg-red-100 text-red-700'
                         }`}>
                           {activity.status.charAt(0).toUpperCase() + activity.status.slice(1)}
                         </span>
@@ -333,17 +375,16 @@ export default function StudentDashboard() {
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        {activity.status === 'certified' && activity.qrCodeUrl && (
-                          <a 
-                            href={activity.qrCodeUrl} 
-                            download 
+                        {activity.status === 'certified' && activity.qrCodeUrl ? (
+                          <a
+                            href={activity.qrCodeUrl}
+                            download
                             className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-bold hover:underline transition duration-300"
                           >
                             <Download size={16} />
                             Download
                           </a>
-                        )}
-                        {activity.status !== 'certified' && (
+                        ) : (
                           <span className="text-gray-400 font-medium text-sm">-</span>
                         )}
                       </td>
