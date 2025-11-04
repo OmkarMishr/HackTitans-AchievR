@@ -64,7 +64,7 @@ export default function AdminDashboard({ user }) {
     }
   };
 
-  // ========== GENERATE CERTIFICATE ==========
+  // ========== GENERATE CERTIFICATE (UPDATED) ==========
   const handleGenerateCertificate = async (activity) => {
     if (!activity || !activity._id) {
       alert('❌ Invalid activity');
@@ -81,7 +81,11 @@ export default function AdminDashboard({ user }) {
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
 
-      console.log('✅ Certificate generated:', response.data);
+      console.log('✅ Certificate Response:', response.data);
+      console.log('✅ PDF Buffer present:', !!response.data.pdfBuffer);
+      console.log('✅ PDF Buffer length:', response.data.pdfBuffer?.length || 'MISSING');
+
+      // ✅ STORE FULL RESPONSE IN STATE
       setCertificateData(response.data);
       setSelectedActivity(activity);
 
@@ -90,6 +94,7 @@ export default function AdminDashboard({ user }) {
       );
 
       if (confirmSend) {
+        // ✅ PASS FULL RESPONSE DATA (INCLUDING pdfBuffer)
         await handleSubmitAndSendEmail(activity._id, response.data);
       }
 
@@ -101,25 +106,42 @@ export default function AdminDashboard({ user }) {
     }
   };
 
-  // ========== SUBMIT & SEND EMAIL ==========
+  // ========== SUBMIT & SEND EMAIL (UPDATED) ==========
   const handleSubmitAndSendEmail = async (activityId, certData) => {
     setCertifying(activityId);
     try {
-      console.log('📧 Sending email...');
+      console.log('📧 Sending email with PDF...');
+      console.log('📋 Certificate Data:', certData);
+
+      // ✅ IMPORTANT: pdfBuffer MUST be included
+      const payload = {
+        certificateId: certData.certificateId,
+        pdfBuffer: certData.pdfBuffer,  // ✅ THIS IS THE FIX
+        studentName: certData.studentName,
+        studentEmail: certData.studentEmail,
+        studentId: certData.studentId,
+        achievement: certData.achievement,
+        organizingBody: certData.organizingBody || 'Unknown',
+        achievementLevel: certData.achievementLevel || 'College',
+        eventDate: certData.eventDate,
+        fileSize: certData.fileSize
+      };
+
+      console.log('🔍 Payload check:');
+      console.log('   certificateId:', !!payload.certificateId);
+      console.log('   pdfBuffer:', !!payload.pdfBuffer);
+      console.log('   pdfBuffer length:', payload.pdfBuffer?.length || 'MISSING');
+      console.log('   studentEmail:', !!payload.studentEmail);
+
+      if (!payload.pdfBuffer) {
+        alert('❌ ERROR: PDF Buffer is missing!\n\nTry generating certificate again.');
+        setCertifying(null);
+        return;
+      }
 
       const response = await axios.post(
         `http://localhost:5000/api/certificates/submit/${activityId}`,
-        {
-          certificateId: certData.certificateId,
-          certificatePath: certData.certificatePath,
-          studentName: certData.studentName,
-          studentEmail: certData.studentEmail,
-          studentId: certData.studentId,
-          achievement: certData.achievement,
-          organizingBody: certData.organizingBody,
-          achievementLevel: certData.achievementLevel,
-          eventDate: certData.eventDate
-        },
+        payload,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -129,7 +151,7 @@ export default function AdminDashboard({ user }) {
       );
 
       console.log('✅ Success:', response.data);
-      alert(`✅ Certificate emailed to ${certData.studentEmail}`);
+      alert(`✅ Certificate emailed to ${certData.studentEmail}\n\n📎 PDF attached!`);
 
       setCertificateData(null);
       setSelectedActivity(null);
@@ -182,7 +204,6 @@ export default function AdminDashboard({ user }) {
   // ========== TOGGLE SELECT ALL ==========
   const handleSelectAll = (e) => {
     if (e.target.checked) {
-      // ✅ FIX: NULL CHECK BEFORE ACCESSING _id
       const validStudentIds = filteredActivities
         .filter(a => a && a.student && a.student._id)
         .map(a => a.student._id);
@@ -194,7 +215,7 @@ export default function AdminDashboard({ user }) {
 
   // ========== TOGGLE STUDENT SELECT ==========
   const handleToggleStudent = (studentId) => {
-    if (!studentId) return; // Safety check
+    if (!studentId) return;
 
     if (selectedStudents.includes(studentId)) {
       setSelectedStudents(selectedStudents.filter(id => id !== studentId));
@@ -206,7 +227,6 @@ export default function AdminDashboard({ user }) {
   // ========== FILTER & SORT ==========
   const filteredActivities = activities
     .filter(activity => {
-      // ✅ FIX: NULL CHECKS
       if (!activity) return false;
 
       const title = activity.title ? activity.title.toLowerCase() : '';
@@ -307,12 +327,6 @@ export default function AdminDashboard({ user }) {
                 </div>
               </div>
               <div className="flex gap-2 ml-4">
-                <button
-                  onClick={() => window.open(certificateData.certificatePath, '_blank')}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-bold text-sm"
-                >
-                  <Eye className="w-4 h-4" /> View PDF
-                </button>
                 <button
                   onClick={() => setCertificateData(null)}
                   className="flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-bold text-sm"
@@ -423,7 +437,6 @@ export default function AdminDashboard({ user }) {
                   </tr>
                 ) : (
                   filteredActivities.map((activity, index) => {
-                    // FIX: NULL CHECKS BEFORE ACCESSING
                     if (!activity || !activity.student) {
                       return (
                         <tr key={index} className="border-b border-gray-200 bg-red-50">
@@ -486,12 +499,12 @@ export default function AdminDashboard({ user }) {
                               </>
                             ) : activity.certificateId ? (
                               <>
-                                
+                                <CheckCircle className="w-3 h-3" />
                                 Done
                               </>
                             ) : (
                               <>
-                                
+                                <Award className="w-3 h-3" />
                                 Generate
                               </>
                             )}
