@@ -1,6 +1,10 @@
+// pages/FacultyDashboard.jsx
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FileCheck, User, Calendar, Award, CheckCircle, XCircle, Loader, FileText, AlertCircle, ExternalLink } from 'lucide-react';
+import { 
+  FileCheck, User, Calendar, Award, CheckCircle, XCircle, Loader, FileText, 
+  AlertCircle, ExternalLink, Download, Eye, QrCode, Printer 
+} from 'lucide-react';
 
 export default function FacultyDashboard() {
   const [activities, setActivities] = useState([]);
@@ -8,6 +12,8 @@ export default function FacultyDashboard() {
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [generatingCert, setGeneratingCert] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchPendingActivities();
@@ -15,42 +21,85 @@ export default function FacultyDashboard() {
 
   const fetchPendingActivities = async () => {
     try {
+      setLoading(true);
+      setError(null);
+      
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No authentication token found. Please login.');
+        return;
+      }
+
+      console.log('📥 Fetching pending activities...');
+      
       const response = await axios.get('http://localhost:5000/api/activities/faculty/pending', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${token}` }
       });
-      setActivities(response.data.activities);
+
+      console.log('✅ Activities fetched:', response.data.activities.length);
+      setActivities(response.data.activities || []);
     } catch (error) {
-      console.error('Error fetching activities:', error);
+      console.error('❌ Error fetching activities:', error.message);
+      setError(error.response?.data?.error || 'Failed to load activities');
     } finally {
       setLoading(false);
     }
   };
 
+  // ========== APPROVE ACTIVITY ==========
   const handleApprove = async (activityId) => {
+    console.log('🔍 DEBUG: Activity ID:', activityId);
+    console.log('🔍 DEBUG: Type:', typeof activityId);
+    
+    if (!activityId) {
+      alert('⚠️ Activity ID is missing');
+      return;
+    }
+
     if (!comment.trim()) {
-      alert('⚠️ Please add a comment');
+      alert('⚠️ Please add a comment before approving');
       return;
     }
 
     setActionLoading(true);
     try {
-      await axios.put(
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('❌ Authentication token missing. Please login again.');
+        return;
+      }
+
+      console.log('📝 Approving activity:', activityId);
+      
+      // ✅ CORRECT ENDPOINT
+      const response = await axios.put(
         `http://localhost:5000/api/activities/${activityId}/approve`,
         { comment },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+
+      console.log('✅ Activity approved:', response.data);
       alert('✅ Activity approved successfully!');
       setSelectedActivity(null);
       setComment('');
-      fetchPendingActivities();
+      await fetchPendingActivities();
     } catch (error) {
-      alert('❌ Error approving activity');
+      console.error('❌ Error approving activity:', error.response?.data || error.message);
+      alert(`❌ Error: ${error.response?.data?.error || error.message}`);
     } finally {
       setActionLoading(false);
     }
   };
 
+  // ========== REJECT ACTIVITY ==========
   const handleReject = async (activityId, reason) => {
+    console.log('🔍 DEBUG: Reject Activity ID:', activityId);
+    
+    if (!activityId) {
+      alert('⚠️ Activity ID is missing');
+      return;
+    }
+
     if (!reason.trim()) {
       alert('⚠️ Please add a rejection reason');
       return;
@@ -58,19 +107,82 @@ export default function FacultyDashboard() {
 
     setActionLoading(true);
     try {
-      await axios.put(
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('❌ Authentication token missing. Please login again.');
+        return;
+      }
+
+      console.log('📝 Rejecting activity:', activityId);
+      
+      // ✅ CORRECT ENDPOINT
+      const response = await axios.put(
         `http://localhost:5000/api/activities/${activityId}/reject`,
         { reason },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+
+      console.log('✅ Activity rejected:', response.data);
       alert('❌ Activity rejected!');
       setSelectedActivity(null);
-      fetchPendingActivities();
+      await fetchPendingActivities();
     } catch (error) {
-      alert('❌ Error rejecting activity');
+      console.error('❌ Error rejecting activity:', error.response?.data || error.message);
+      alert(`❌ Error: ${error.response?.data?.error || error.message}`);
     } finally {
       setActionLoading(false);
     }
+  };
+
+  // ========== GENERATE CERTIFICATE ==========
+  const handleGenerateCertificate = async (activityId) => {
+    if (!activityId) {
+      alert('⚠️ Activity ID is missing');
+      return;
+    }
+
+    setGeneratingCert(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('❌ Authentication token missing. Please login again.');
+        return;
+      }
+
+      console.log('📜 Generating certificate with QR code...');
+      
+      const response = await axios.post(
+        `http://localhost:5000/api/certificates/generate/${activityId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log('✅ Certificate generated:', response.data);
+      alert('✅ Certificate with QR code generated successfully!');
+      
+      setSelectedActivity(prev => ({
+        ...prev,
+        certificateId: response.data.certificateId,
+        certificatePath: response.data.certificatePath
+      }));
+
+      await fetchPendingActivities();
+    } catch (error) {
+      console.error('❌ Error generating certificate:', error.response?.data || error.message);
+      alert(`❌ Error: ${error.response?.data?.error || error.message}`);
+    } finally {
+      setGeneratingCert(false);
+    }
+  };
+
+  // ========== DOWNLOAD CERTIFICATE ==========
+  const handleDownloadCertificate = (certificateId) => {
+    window.location.href = `http://localhost:5000/api/certificates/download/${certificateId}`;
+  };
+
+  // ========== VIEW CERTIFICATE ==========
+  const handleViewCertificate = (certificateId) => {
+    window.open(`http://localhost:5000/api/certificates/view/${certificateId}`, '_blank');
   };
 
   if (loading) {
@@ -85,17 +197,31 @@ export default function FacultyDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 font-sans">
       <div className="max-w-7xl mx-auto px-8 py-12">
         {/* Header Section */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
             <div>
-              <h1 className="text-5xl font-light text-gray-900">Faculty Dashboard</h1>
-              <p className="text-gray-600 font-light mt-1">Review and approve student activities</p>
+              <h1 className="text-5xl font-light text-gray-900">👨‍🏫 Faculty Dashboard</h1>
+              <p className="text-gray-600 font-light mt-1">Review, approve & generate certificates</p>
             </div>
           </div>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-8 bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            <p className="text-red-700 font-light">{error}</p>
+            <button
+              onClick={fetchPendingActivities}
+              className="ml-auto px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100 rounded-lg transition"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* Stats Card */}
         <div className="mb-8">
@@ -136,12 +262,15 @@ export default function FacultyDashboard() {
               </div>
             ) : (
               <div className="space-y-4">
-                {activities.map((activity, index) => (
+                {activities.map((activity) => (
                   <div
-                    key={activity._id}
-                    onClick={() => setSelectedActivity(activity)}
+                    key={activity._id}  // ✅ USE _id NOT id
+                    onClick={() => {
+                      setSelectedActivity(activity);
+                      setComment('');
+                    }}
                     className={`bg-white p-6 border-2 rounded-xl cursor-pointer transition duration-300 hover:shadow-lg ${
-                      selectedActivity?._id === activity._id
+                      selectedActivity?._id === activity._id  // ✅ USE _id NOT id
                         ? 'border-orange-400 bg-orange-50 shadow-lg'
                         : 'border-gray-200 hover:border-orange-300'
                     }`}
@@ -165,7 +294,7 @@ export default function FacultyDashboard() {
                           </div>
                         </div>
                       </div>
-                      {selectedActivity?._id === activity._id && (
+                      {selectedActivity?._id === activity._id && (  // ✅ USE _id NOT id
                         <span className="px-3 py-1 bg-gradient-to-r from-orange-600 to-orange-500 text-white text-xs font-medium rounded-full">
                           Selected
                         </span>
@@ -179,6 +308,11 @@ export default function FacultyDashboard() {
                       {activity.achievementLevel && (
                         <span className="inline-block px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
                           {activity.achievementLevel}
+                        </span>
+                      )}
+                      {activity.certificateId && (
+                        <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                          ✅ Certified
                         </span>
                       )}
                     </div>
@@ -210,11 +344,14 @@ export default function FacultyDashboard() {
                         <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Student</p>
                         <p className="text-gray-900 font-light">{selectedActivity.student?.name || 'Unknown'}</p>
                         <p className="text-sm text-gray-600 font-light">{selectedActivity.student?.rollNumber || 'N/A'}</p>
+                        <p className="text-sm text-gray-600 font-light">{selectedActivity.student?.email || 'N/A'}</p>
                       </div>
 
                       <div>
                         <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Description</p>
-                        <p className="text-sm text-gray-700 font-light leading-relaxed">{selectedActivity.description}</p>
+                        <p className="text-sm text-gray-700 font-light leading-relaxed max-h-32 overflow-y-auto">
+                          {selectedActivity.description}
+                        </p>
                       </div>
 
                       {selectedActivity.organizingBody && (
@@ -235,47 +372,12 @@ export default function FacultyDashboard() {
                     </div>
                   </div>
 
-                  {/* Proof Documents */}
-                  <div className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-orange-400 transition duration-300">
-                    <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">Proof Documents</p>
-                    <div className="space-y-2">
-                      {selectedActivity.proofDocuments?.length > 0 ? (
-                        selectedActivity.proofDocuments.map((doc) => (
-                          <a
-                            key={doc.url}
-                            href={doc.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700 font-light group"
-                          >
-                            <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition" />
-                            {doc.filename}
-                          </a>
-                        ))
-                      ) : (
-                        <p className="text-sm text-gray-500 font-light">No documents uploaded</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Fraud Status */}
-                  <div className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-orange-400 transition duration-300">
-                    <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">Fraud Status</p>
-                    <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${
-                      selectedActivity.fraudStatus === 'authentic' 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {selectedActivity.fraudStatus || 'not_scanned'}
-                    </span>
-                  </div>
-
                   {/* Skills Section */}
                   {(selectedActivity.selectedTechnicalSkills?.length > 0 || 
                     selectedActivity.selectedSoftSkills?.length > 0 || 
                     selectedActivity.selectedTools?.length > 0) && (
                     <div className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-orange-400 transition duration-300">
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {selectedActivity.selectedTechnicalSkills?.length > 0 && (
                           <div>
                             <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Technical Skills</p>
@@ -327,58 +429,114 @@ export default function FacultyDashboard() {
                     </div>
                   )}
 
-                  {/* Review Comment */}
-                  <div className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-orange-400 transition duration-300">
-                    <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">Review Comment *</p>
-                    <textarea
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
-                      placeholder="Add your review comment..."
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-light text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-500 transition duration-300 h-24 resize-none"
-                    />
-                  </div>
+                  {/* Certificate Section */}
+                  {selectedActivity.status === 'approved' ? (
+                    <div className="bg-white border-2 border-green-200 rounded-xl p-6 hover:border-green-400 transition duration-300 bg-green-50">
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-2">✅ Status</p>
+                          <p className="text-sm text-green-700 font-medium">Approved & Ready</p>
+                        </div>
 
-                  {/* Action Buttons */}
-                  <div className="space-y-3">
-                    <button
-                      onClick={() => handleApprove(selectedActivity._id)}
-                      disabled={actionLoading}
-                      className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:from-orange-700 hover:to-orange-600 disabled:from-gray-400 disabled:to-gray-400 transition duration-300 font-medium text-sm shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 disabled:shadow-none rounded-xl"
-                    >
-                      {actionLoading ? (
-                        <>
-                          <Loader className="w-4 h-4 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle className="w-4 h-4" />
-                          Approve Activity
-                        </>
-                      )}
-                    </button>
+                        {selectedActivity.certificateId ? (
+                          <>
+                            <div className="border-t border-green-200 pt-3">
+                              <p className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-2">📜 Certificate Generated</p>
+                              <div className="space-y-2">
+                                <button
+                                  onClick={() => handleViewCertificate(selectedActivity.certificateId)}
+                                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                                >
+                                  <Eye size={16} />
+                                  View Certificate
+                                </button>
+                                <button
+                                  onClick={() => handleDownloadCertificate(selectedActivity.certificateId)}
+                                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
+                                >
+                                  <Download size={16} />
+                                  Download PDF
+                                </button>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => handleGenerateCertificate(selectedActivity._id)}  // ✅ USE _id NOT id
+                            disabled={generatingCert}
+                            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-lg hover:from-purple-700 hover:to-purple-600 disabled:from-gray-400 disabled:to-gray-400 transition text-sm font-medium"
+                          >
+                            {generatingCert ? (
+                              <>
+                                <Loader size={16} className="animate-spin" />
+                                Generating...
+                              </>
+                            ) : (
+                              <>
+                                <Printer size={16} />
+                                🎓 Generate Certificate with QR
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Review Comment */}
+                      <div className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-orange-400 transition duration-300">
+                        <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">Review Comment *</p>
+                        <textarea
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
+                          placeholder="Add your review comment..."
+                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-light text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-500 transition duration-300 h-24 resize-none"
+                        />
+                      </div>
 
-                    <button
-                      onClick={() => {
-                        const reason = prompt('Enter rejection reason:');
-                        if (reason) handleReject(selectedActivity._id, reason);
-                      }}
-                      disabled={actionLoading}
-                      className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 hover:border-red-500 hover:text-red-600 hover:bg-red-50 disabled:border-gray-300 disabled:text-gray-400 disabled:bg-gray-100 transition duration-300 font-medium text-sm rounded-xl"
-                    >
-                      {actionLoading ? (
-                        <>
-                          <Loader className="w-4 h-4 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <XCircle className="w-4 h-4" />
-                          Reject Activity
-                        </>
-                      )}
-                    </button>
-                  </div>
+                      {/* Action Buttons */}
+                      <div className="space-y-3">
+                        <button
+                          onClick={() => handleApprove(selectedActivity._id)}  // ✅ USE _id NOT id
+                          disabled={actionLoading || !comment.trim()}
+                          className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:from-orange-700 hover:to-orange-600 disabled:from-gray-400 disabled:to-gray-400 transition duration-300 font-medium text-sm shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 disabled:shadow-none rounded-xl"
+                        >
+                          {actionLoading ? (
+                            <>
+                              <Loader className="w-4 h-4 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle className="w-4 h-4" />
+                              ✅ Approve Activity
+                            </>
+                          )}
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            const reason = prompt('Enter rejection reason:');
+                            if (reason) handleReject(selectedActivity._id, reason);  // ✅ USE _id NOT id
+                          }}
+                          disabled={actionLoading}
+                          className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 hover:border-red-500 hover:text-red-600 hover:bg-red-50 disabled:border-gray-300 disabled:text-gray-400 disabled:bg-gray-100 transition duration-300 font-medium text-sm rounded-xl"
+                        >
+                          {actionLoading ? (
+                            <>
+                              <Loader className="w-4 h-4 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              <XCircle className="w-4 h-4" />
+                              ❌ Reject Activity
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </>
             ) : (
