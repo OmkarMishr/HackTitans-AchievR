@@ -175,18 +175,18 @@ export default function PremiumAchievRLanding({ user, setUser }) {
               },
               {
                 num: '02',
-                title: 'AI Verification',
-                desc: '98% accuracy fraud detection in 2 seconds'
+                title: 'Faculty Approval',
+                desc: 'One-click approval with comments workflow`'
               },
               {
                 num: '03',
-                title: 'Faculty Approval',
-                desc: 'One-click approval with comments workflow'
+                title: 'Get Certified',
+                desc: 'QR code, shareable proof, searchable profile'
               },
               {
                 num: '04',
-                title: 'Get Certified',
-                desc: 'QR code, shareable proof, searchable profile'
+                title: 'Share Portfolio',
+                desc: 'Showcase your verified skills and achievements'
               }
             ].map((step, idx) => (
               <div key={idx} className="relative group">
@@ -234,8 +234,8 @@ export default function PremiumAchievRLanding({ user, setUser }) {
                     <CheckCircle2 size={20} className="text-orange-600 group-hover:text-orange-700 transition" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900 mb-1 group-hover:text-orange-700 transition">Real-time AI Validation</p>
-                    <p className="text-sm text-gray-600 font-light">Document authenticity verified instantly</p>
+                    <p className="font-medium text-gray-900 mb-1 group-hover:text-orange-700 transition">Activity Record</p>
+                    <p className="text-sm text-gray-600 font-light">All activities are recorded and timestamped</p>
                   </div>
                 </div>
                 <div className="flex gap-4 group">
@@ -243,8 +243,8 @@ export default function PremiumAchievRLanding({ user, setUser }) {
                     <Lock size={20} className="text-orange-600 group-hover:text-orange-700 transition" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900 mb-1 group-hover:text-orange-700 transition">Immutable Records</p>
-                    <p className="text-sm text-gray-600 font-light">Blockchain-secured certificates</p>
+                    <p className="font-medium text-gray-900 mb-1 group-hover:text-orange-700 transition">Get Certified</p>
+                    <p className="text-sm text-gray-600 font-light">Verified certificates with QR-Codes</p>
                   </div>
                 </div>
                 <div className="flex gap-4 group">

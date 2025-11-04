@@ -36,10 +36,10 @@ export default function FacultyDashboard() {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      console.log('✅ Activities fetched:', response.data.activities.length);
+      console.log(' Activities fetched:', response.data.activities.length);
       setActivities(response.data.activities || []);
     } catch (error) {
-      console.error('❌ Error fetching activities:', error.message);
+      console.error(' Error fetching activities:', error.message);
       setError(error.response?.data?.error || 'Failed to load activities');
     } finally {
       setLoading(false);
@@ -48,16 +48,16 @@ export default function FacultyDashboard() {
 
   // ========== APPROVE ACTIVITY ==========
   const handleApprove = async (activityId) => {
-    console.log('🔍 DEBUG: Activity ID:', activityId);
-    console.log('🔍 DEBUG: Type:', typeof activityId);
+    console.log(' DEBUG: Activity ID:', activityId);
+    console.log(' DEBUG: Type:', typeof activityId);
     
     if (!activityId) {
-      alert('⚠️ Activity ID is missing');
+      alert(' Activity ID is missing');
       return;
     }
 
     if (!comment.trim()) {
-      alert('⚠️ Please add a comment before approving');
+      alert(' Please add a comment before approving');
       return;
     }
 
@@ -65,27 +65,27 @@ export default function FacultyDashboard() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('❌ Authentication token missing. Please login again.');
+        alert(' Authentication token missing. Please login again.');
         return;
       }
 
-      console.log('📝 Approving activity:', activityId);
+      console.log(' Approving activity:', activityId);
       
-      // ✅ CORRECT ENDPOINT
+      // CORRECT ENDPOINT
       const response = await axios.put(
         `http://localhost:5000/api/activities/${activityId}/approve`,
         { comment },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log('✅ Activity approved:', response.data);
-      alert('✅ Activity approved successfully!');
+      console.log(' Activity approved:', response.data);
+      alert(' Activity approved successfully!');
       setSelectedActivity(null);
       setComment('');
       await fetchPendingActivities();
     } catch (error) {
-      console.error('❌ Error approving activity:', error.response?.data || error.message);
-      alert(`❌ Error: ${error.response?.data?.error || error.message}`);
+      console.error(' Error approving activity:', error.response?.data || error.message);
+      alert(` Error: ${error.response?.data?.error || error.message}`);
     } finally {
       setActionLoading(false);
     }
@@ -96,12 +96,12 @@ export default function FacultyDashboard() {
     console.log('🔍 DEBUG: Reject Activity ID:', activityId);
     
     if (!activityId) {
-      alert('⚠️ Activity ID is missing');
+      alert(' Activity ID is missing');
       return;
     }
 
     if (!reason.trim()) {
-      alert('⚠️ Please add a rejection reason');
+      alert(' Please add a rejection reason');
       return;
     }
 
@@ -109,26 +109,26 @@ export default function FacultyDashboard() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('❌ Authentication token missing. Please login again.');
+        alert(' Authentication token missing. Please login again.');
         return;
       }
 
-      console.log('📝 Rejecting activity:', activityId);
+      console.log(' Rejecting activity:', activityId);
       
-      // ✅ CORRECT ENDPOINT
+      //  CORRECT ENDPOINT
       const response = await axios.put(
         `http://localhost:5000/api/activities/${activityId}/reject`,
         { reason },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log('✅ Activity rejected:', response.data);
-      alert('❌ Activity rejected!');
+      console.log(' Activity rejected:', response.data);
+      alert(' Activity rejected!');
       setSelectedActivity(null);
       await fetchPendingActivities();
     } catch (error) {
-      console.error('❌ Error rejecting activity:', error.response?.data || error.message);
-      alert(`❌ Error: ${error.response?.data?.error || error.message}`);
+      console.error(' Error rejecting activity:', error.response?.data || error.message);
+      alert(` Error: ${error.response?.data?.error || error.message}`);
     } finally {
       setActionLoading(false);
     }
@@ -137,7 +137,7 @@ export default function FacultyDashboard() {
   // ========== GENERATE CERTIFICATE ==========
   const handleGenerateCertificate = async (activityId) => {
     if (!activityId) {
-      alert('⚠️ Activity ID is missing');
+      alert(' Activity ID is missing');
       return;
     }
 
@@ -145,11 +145,11 @@ export default function FacultyDashboard() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('❌ Authentication token missing. Please login again.');
+        alert(' Authentication token missing. Please login again.');
         return;
       }
 
-      console.log('📜 Generating certificate with QR code...');
+      console.log(' Generating certificate with QR code...');
       
       const response = await axios.post(
         `http://localhost:5000/api/certificates/generate/${activityId}`,
@@ -157,8 +157,8 @@ export default function FacultyDashboard() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log('✅ Certificate generated:', response.data);
-      alert('✅ Certificate with QR code generated successfully!');
+      console.log(' Certificate generated:', response.data);
+      alert(' Certificate with QR code generated successfully!');
       
       setSelectedActivity(prev => ({
         ...prev,
