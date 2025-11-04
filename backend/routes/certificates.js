@@ -9,6 +9,7 @@ const User = require('../models/User');
 const authMiddleware = require('../middleware/auth');
 const emailService = require('../utils/emailService');
 
+
 // ========== GENERATE CERTIFICATE ==========
 router.post('/generate/:activityId', authMiddleware, async (req, res) => {
   try {
@@ -30,7 +31,6 @@ router.post('/generate/:activityId', authMiddleware, async (req, res) => {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-
     const certificateContent = `
 ╔════════════════════════════════════════════════════════════════════╗
 ║                  CERTIFICATE OF ACHIEVEMENT                        ║

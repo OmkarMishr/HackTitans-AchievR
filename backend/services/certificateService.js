@@ -1,4 +1,4 @@
-const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
+const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 const QRCode = require('qrcode');
@@ -7,7 +7,8 @@ class CertificateService {
   
   async generateCertificateWithQR(certificateData) {
     try {
-      console.log('📜 Generating professional certificate...');
+      console.log('\n📜 GENERATING PROFESSIONAL CERTIFICATE (PDF)');
+      console.log('='.repeat(70));
 
       const {
         studentName,
@@ -16,293 +17,216 @@ class CertificateService {
         organizingBody,
         eventDate,
         achievementLevel,
-        certificateId,
-        headerText = 'CERTIFICATE OF ACHIEVEMENT'
+        certificateId
       } = certificateData;
 
-      const pdfDoc = await PDFDocument.create();
-      const page = pdfDoc.addPage([850, 1100]);
-      const { width, height } = page.getSize();
-
-      console.log('✅ PDF Document created');
-
-      const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const helveticaBoldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-      console.log('✅ Fonts embedded successfully');
-
-      // Background
-      page.drawRectangle({
-        x: 0,
-        y: 0,
-        width: width,
-        height: height,
-        color: rgb(1, 0.98, 0.95)
-      });
-
-      // Outer border
-      page.drawRectangle({
-        x: 20,
-        y: 20,
-        width: width - 40,
-        height: height - 40,
-        borderColor: rgb(0.2, 0.4, 0.8),
-        borderWidth: 4
-      });
-
-      // Inner border
-      page.drawRectangle({
-        x: 40,
-        y: 40,
-        width: width - 80,
-        height: height - 80,
-        borderColor: rgb(0.2, 0.4, 0.8),
-        borderWidth: 1
-      });
-
-      // Top accent
-      page.drawRectangle({
-        x: 40,
-        y: height - 120,
-        width: width - 80,
-        height: 80,
-        color: rgb(0.2, 0.4, 0.8, 0.1)
-      });
-
-      // Header
-      const headerX = (width - (headerText.length * 8)) / 2;
-      page.drawText(headerText, {
-        x: headerX,
-        y: height - 80,
-        size: 36,
-        color: rgb(0.2, 0.4, 0.8),
-        font: helveticaBoldFont
-      });
-
-      // Line under header
-      page.drawLine({
-        start: { x: 100, y: height - 140 },
-        end: { x: width - 100, y: height - 140 },
-        thickness: 2,
-        color: rgb(0.2, 0.4, 0.8)
-      });
-
-      // Student name section
-      page.drawText('This Certificate is Proudly Presented to', {
-        x: 50,
-        y: height - 200,
-        size: 14,
-        color: rgb(0.1, 0.1, 0.1),
-        font: helveticaFont
-      });
-
-      page.drawText(studentName.toUpperCase(), {
-        x: 50,
-        y: height - 250,
-        size: 28,
-        color: rgb(0.2, 0.4, 0.8),
-        font: helveticaBoldFont
-      });
-
-      // Achievement section
-      page.drawText('For Successfully Achieving', {
-        x: 50,
-        y: height - 310,
-        size: 12,
-        color: rgb(0.1, 0.1, 0.1),
-        font: helveticaFont
-      });
-
-      page.drawText(achievement.toUpperCase(), {
-        x: 50,
-        y: height - 350,
-        size: 20,
-        color: rgb(0.2, 0.4, 0.8),
-        font: helveticaBoldFont
-      });
-
-      // Description
-      page.drawText('Achievement Description:', {
-        x: 50,
-        y: height - 410,
-        size: 12,
-        color: rgb(0.1, 0.1, 0.1),
-        font: helveticaBoldFont
-      });
-
-      const descriptionLines = this.wrapText(description, 90);
-      let descY = height - 440;
-
-      for (const line of descriptionLines.slice(0, 5)) {
-        page.drawText(line, {
-          x: 70,
-          y: descY,
-          size: 11,
-          color: rgb(0.3, 0.3, 0.3),
-          font: helveticaFont
-        });
-        descY -= 20;
+      if (!studentName || !achievement || !certificateId) {
+        throw new Error('Missing required fields');
       }
 
-      // Achievement details
-      page.drawText('Achievement Details:', {
-        x: 50,
-        y: descY - 20,
-        size: 11,
-        color: rgb(0.1, 0.1, 0.1),
-        font: helveticaBoldFont
+      console.log(`✅ Student: ${studentName}`);
+      console.log(`✅ Achievement: ${achievement}`);
+      console.log(`✅ Certificate ID: ${certificateId}`);
+
+      const certificateDir = path.join(__dirname, '../uploads/certificates');
+      if (!fs.existsSync(certificateDir)) {
+        fs.mkdirSync(certificateDir, { recursive: true });
+        console.log(`✅ Directory created`);
+      }
+
+      const certificatePath = path.join(certificateDir, `${certificateId}.pdf`);
+
+      console.log('📝 Creating PDF document...');
+      const doc = new PDFDocument({
+        size: 'A4',
+        margin: 50,
+        bufferPages: true
       });
 
-      descY -= 45;
+      const stream = fs.createWriteStream(certificatePath);
 
-      // Level (NO special characters)
-      page.drawText(`Level: ${achievementLevel || 'College'}`, {
-        x: 70,
-        y: descY,
-        size: 10,
-        color: rgb(0.4, 0.4, 0.4),
-        font: helveticaFont
+      stream.on('error', (err) => {
+        console.error('❌ Stream error:', err);
       });
 
-      descY -= 20;
-
-      // Organization
-      page.drawText(`Organized by: ${organizingBody || 'Unknown'}`, {
-        x: 70,
-        y: descY,
-        size: 10,
-        color: rgb(0.4, 0.4, 0.4),
-        font: helveticaFont
+      doc.on('error', (err) => {
+        console.error('❌ Document error:', err);
       });
 
-      descY -= 20;
+      doc.pipe(stream);
 
-      // Event date
-      page.drawText(`Event Date: ${eventDate || new Date().toLocaleDateString()}`, {
-        x: 70,
-        y: descY,
-        size: 10,
-        color: rgb(0.4, 0.4, 0.4),
-        font: helveticaFont
-      });
+      const pageWidth = doc.page.width;
+      const pageHeight = doc.page.height;
 
-      // Signature line
-      page.drawLine({
-        start: { x: 100, y: 280 },
-        end: { x: 350, y: 280 },
-        thickness: 1,
-        color: rgb(0, 0, 0)
-      });
+      // Background
+      doc.fillColor('#FFFFFF').rect(0, 0, pageWidth, pageHeight).fill();
 
-      page.drawText('Authorized Signature', {
-        x: 150,
-        y: 260,
-        size: 10,
-        color: rgb(0, 0, 0),
-        font: helveticaFont
-      });
+      // Outer Border
+      doc.strokeColor('#000000').lineWidth(3);
+      doc.rect(30, 30, pageWidth - 60, pageHeight - 60).stroke();
 
-      // Verification info (NO SPECIAL CHARACTERS - REMOVED ARROW)
-      page.drawText('Certificate Verification:', {
-        x: 50,
-        y: 200,
-        size: 10,
-        color: rgb(0.4, 0.4, 0.4),
-        font: helveticaBoldFont
-      });
+      // Inner Border
+      doc.lineWidth(1);
+      doc.rect(40, 40, pageWidth - 80, pageHeight - 80).stroke();
 
-      // Changed: Removed arrow character
-      page.drawText('Scan QR Code for Instant Verification', {
-        x: 50,
-        y: 180,
-        size: 9,
-        color: rgb(0.5, 0.5, 0.5),
-        font: helveticaFont
-      });
+      // Top Line
+      doc.moveTo(50, 100).lineTo(pageWidth - 50, 100).stroke();
 
-      // Certificate ID
-      page.drawText(`Certificate ID: ${certificateId}`, {
-        x: 50,
-        y: 150,
-        size: 8,
-        color: rgb(0.6, 0.6, 0.6),
-        font: helveticaFont
-      });
+      // Title
+      doc.fontSize(36).font('Helvetica-Bold').fillColor('#000000');
+      doc.text('CERTIFICATE OF ACHIEVEMENT', { align: 'center' });
 
-      // Issue date
-      const issueDate = new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
+      // Subheading
+      doc.fontSize(12).font('Helvetica').fillColor('#333333');
+      doc.moveDown(0.5);
+      doc.text('This is to certify that', { align: 'center' });
 
-      page.drawText(`Issued: ${issueDate}`, {
-        x: 50,
-        y: 130,
-        size: 8,
-        color: rgb(0.6, 0.6, 0.6),
-        font: helveticaFont
-      });
+      // Student Name
+      doc.moveDown(0.5);
+      doc.fontSize(28).font('Helvetica-Bold').fillColor('#000000');
+      doc.text(studentName.toUpperCase(), { align: 'center' });
 
-      // QR Code generation
+      // Achievement Text
+      doc.moveDown(0.5);
+      doc.fontSize(12).font('Helvetica').fillColor('#333333');
+      doc.text('has successfully completed', { align: 'center' });
+
+      // Achievement Title
+      doc.moveDown(0.5);
+      doc.fontSize(22).font('Helvetica-Bold').fillColor('#000000');
+      doc.text(achievement.toUpperCase(), { align: 'center' });
+
+      // Divider
+      doc.moveDown(0.8);
+      doc.moveTo(100, doc.y).lineTo(pageWidth - 100, doc.y).stroke();
+
+      // Details
+      doc.moveDown(0.5);
+      doc.fontSize(11).font('Helvetica').fillColor('#333333');
+
+      doc.text(`Achievement Level: ${achievementLevel || 'College'}`);
+      doc.text(`Organized by: ${organizingBody || 'Unknown'}`);
+
+      const formattedDate = eventDate 
+        ? new Date(eventDate).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })
+        : new Date().toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          });
+
+      doc.text(`Event Date: ${formattedDate}`);
+      doc.text(`Issued on: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`);
+      doc.text(`Certificate ID: ${certificateId}`);
+
+      // Description
+      if (description && description.trim()) {
+        doc.moveDown(0.5);
+        doc.fontSize(10).font('Helvetica-Bold').fillColor('#000000');
+        doc.text('Description:');
+        doc.fontSize(10).font('Helvetica').fillColor('#555555');
+        doc.text(description, { align: 'left', lineGap: 5 });
+      }
+
+      // Signature Line
+      doc.moveDown(1);
+      doc.moveTo(100, doc.y).lineTo(300, doc.y).stroke();
+      doc.fontSize(10).font('Helvetica').fillColor('#000000');
+      doc.text('Authorized Signature', { align: 'center', x: 100, width: 200 });
+
+      // QR CODE
       console.log('📱 Generating QR code...');
-      const verificationUrl = `http://localhost:5000/api/certificates/verify/${certificateId}`;
-      
       try {
+        const verificationUrl = `${process.env.APP_URL || 'http://localhost:3000'}/api/certificates/verify/${certificateId}`;
+        
+        console.log(`📱 QR URL: ${verificationUrl}`);
+
         const qrCodeBuffer = await QRCode.toBuffer(verificationUrl, {
           errorCorrectionLevel: 'H',
           type: 'image/png',
-          width: 200,
+          width: 150,
           margin: 1,
           color: { dark: '#000000', light: '#FFFFFF' }
         });
 
-        const qrImage = await pdfDoc.embedPng(qrCodeBuffer);
+        const qrImagePath = path.join(certificateDir, `qr_${certificateId}.png`);
+        fs.writeFileSync(qrImagePath, qrCodeBuffer);
+        console.log(`✅ QR code created`);
 
-        page.drawImage(qrImage, {
-          x: width - 240,
-          y: 80,
-          width: 180,
-          height: 180
+        // Add QR to PDF
+        doc.image(qrImagePath, pageWidth - 220, 120, { 
+          width: 150, 
+          height: 150 
         });
 
-        page.drawText('Scan to Verify', {
-          x: width - 240,
-          y: 60,
-          size: 9,
-          color: rgb(0.2, 0.4, 0.8),
-          font: helveticaBoldFont
+        doc.fontSize(10).font('Helvetica-Bold').fillColor('#000000');
+        doc.text('SCAN TO VERIFY', pageWidth - 220, 280, { 
+          width: 150, 
+          align: 'center' 
         });
 
-        console.log('✅ QR code embedded successfully');
+        doc.fontSize(8).font('Helvetica').fillColor('#666666');
+        doc.text('Verify Authenticity', pageWidth - 220, 300, { 
+          width: 150, 
+          align: 'center' 
+        });
+
+        console.log('✅ QR code embedded');
       } catch (qrError) {
-        console.warn('⚠️ QR warning:', qrError.message);
+        console.warn('⚠️ QR code warning:', qrError.message);
       }
 
-      // Save PDF
-      const pdfBytes = await pdfDoc.save();
-      
-      const certificateDir = './uploads/certificates';
-      if (!fs.existsSync(certificateDir)) {
-        fs.mkdirSync(certificateDir, { recursive: true });
-      }
+      // Security Badge
+      doc.fontSize(8).font('Helvetica').fillColor('#888888');
+      doc.text('VERIFIED & SECURED', 50, pageHeight - 50, { align: 'left' });
+      doc.text('Issued by AchievR', pageWidth - 150, pageHeight - 50, { align: 'right', width: 100 });
 
-      const certificatePath = path.join(certificateDir, `${certificateId}.pdf`);
-      fs.writeFileSync(certificatePath, pdfBytes);
+      // Footer
+      doc.fontSize(8).font('Helvetica').fillColor('#666666');
+      doc.text('AchievR - Credential Verification System', { align: 'center' });
+      doc.text('All Rights Reserved © 2025', { align: 'center' });
 
-      console.log('✅ Certificate PDF saved:', certificatePath);
-      console.log('📊 PDF Size:', (pdfBytes.length / 1024).toFixed(2), 'KB');
+      console.log('📄 Finalizing PDF...');
+      doc.end();
 
-      return {
-        success: true,
-        certificatePath,
-        certificateId,
-        fileSize: pdfBytes.length,
-        qrEmbedded: true,
-        message: 'Certificate generated successfully'
-      };
+      return new Promise((resolve, reject) => {
+        stream.on('finish', () => {
+          console.log('✅ PDF stream finished');
+
+          if (!fs.existsSync(certificatePath)) {
+            console.error('❌ File was not created!');
+            return reject(new Error('PDF file was not created'));
+          }
+
+          const fileSize = fs.statSync(certificatePath).size;
+          console.log(`✅ Certificate created successfully`);
+          console.log(`   Path: ${certificatePath}`);
+          console.log(`   Size: ${(fileSize / 1024).toFixed(2)} KB`);
+          console.log('='.repeat(70) + '\n');
+
+          resolve({
+            success: true,
+            certificatePath,
+            certificateId,
+            fileSize,
+            qrEmbedded: true,
+            message: 'Certificate generated with QR code'
+          });
+        });
+
+        stream.on('error', (err) => {
+          console.error('❌ Stream error:', err);
+          reject(err);
+        });
+      });
+
     } catch (error) {
-      console.error('❌ Error:', error.message);
+      console.error('❌ Certificate Generation Error:', error.message);
+      console.log('='.repeat(70) + '\n');
       return { 
         success: false, 
         error: error.message
@@ -310,44 +234,27 @@ class CertificateService {
     }
   }
 
-  wrapText(text, maxLength) {
-    if (!text) return [];
-    
-    const words = text.split(' ');
-    const lines = [];
-    let currentLine = '';
-
-    for (const word of words) {
-      if ((currentLine + word).length > maxLength) {
-        if (currentLine) lines.push(currentLine);
-        currentLine = word;
-      } else {
-        currentLine += (currentLine ? ' ' : '') + word;
-      }
-    }
-
-    if (currentLine) lines.push(currentLine);
-    return lines;
-  }
-
   getCertificate(certificateId) {
     try {
-      const certificatePath = path.join('./uploads/certificates', `${certificateId}.pdf`);
+      const certificatePath = path.join(__dirname, '../uploads/certificates', `${certificateId}.pdf`);
 
       if (fs.existsSync(certificatePath)) {
+        const stats = fs.statSync(certificatePath);
         return {
           exists: true,
           path: certificatePath,
-          fileName: `${certificateId}.pdf`
+          fileName: `${certificateId}.pdf`,
+          size: stats.size
         };
       }
 
       return { exists: false, error: 'Certificate not found' };
     } catch (error) {
-      console.error('Error:', error);
+      console.error('❌ Error:', error);
       return { error: error.message };
     }
   }
 }
 
+// ✅ IMPORTANT: EXPORT CORRECTLY
 module.exports = new CertificateService();
