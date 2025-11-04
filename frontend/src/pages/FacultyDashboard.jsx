@@ -203,7 +203,7 @@ export default function FacultyDashboard() {
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
             <div>
-              <h1 className="text-5xl font-light text-gray-900">👨‍🏫 Faculty Dashboard</h1>
+              <h1 className="text-5xl font-light text-gray-900">👨 Faculty Dashboard</h1>
               <p className="text-gray-600 font-light mt-1">Review, approve & generate certificates</p>
             </div>
           </div>

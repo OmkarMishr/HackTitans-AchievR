@@ -254,7 +254,7 @@ export default function AdminDashboard({ user }) {
         {/* ========== HEADER ========== */}
         <div className="mb-12 flex items-center justify-between">
           <div>
-            <h1 className="text-5xl font-bold text-gray-900">👨‍💼 Admin Dashboard</h1>
+            <h1 className="text-5xl font-bold text-gray-900"> Admin Dashboard</h1>
             <p className="text-gray-600 font-light mt-2">Manage & certify approved activities</p>
           </div>
           <button
