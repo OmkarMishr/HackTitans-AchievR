@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 const activitySchema = new mongoose.Schema({
   
-  // ========== STUDENT & IDENTIFICATION ==========
-  student: { 
+  // STUDENT & IDENTIFICATION
+ student: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User', 
     required: true,
@@ -15,7 +15,7 @@ const activitySchema = new mongoose.Schema({
     index: true
   },
   
-  // ========== ACTIVITY DETAILS ==========
+  // ACTIVITY DETAILS
   title: { 
     type: String, 
     required: true,
@@ -35,7 +35,7 @@ const activitySchema = new mongoose.Schema({
     index: true
   },
   
-  // ========== ACHIEVEMENT INFO ==========
+  // ACHIEVEMENT INFO
   organizingBody: {
     type: String,
     trim: true,
@@ -53,7 +53,7 @@ const activitySchema = new mongoose.Schema({
     index: true
   },
   
-  // ========== PROOF DOCUMENTS ==========
+  // PROOF DOCUMENTS
   proofDocuments: [{
     _id: false,
     filename: {
@@ -73,7 +73,7 @@ const activitySchema = new mongoose.Schema({
     }
   }],
   
-  // ========== SKILLS SELECTION ==========
+  // SKILLS SELECTION
   selectedTechnicalSkills: {
     type: [String],
     default: [],
@@ -88,7 +88,7 @@ const activitySchema = new mongoose.Schema({
     default: []
   },
   
-  // ========== STATUS MANAGEMENT ==========
+  // STATUS MANAGEMENT
   status: {
     type: String,
     enum: ['pending', 'approved', 'rejected', 'flagged', 'certified'],
@@ -96,7 +96,7 @@ const activitySchema = new mongoose.Schema({
     index: true
   },
   
-  // ========== REVIEW PROCESS ==========
+  //REVIEW PROCESS 
   reviewedBy: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User',
@@ -113,14 +113,14 @@ const activitySchema = new mongoose.Schema({
     index: true
   },
   
-  // ========== REJECTION INFO ==========
+  // REJECTION INFO 
   rejectionReason: {
     type: String,
     maxlength: 2000
   },
   rejectedAt: Date,
   
-  // ========== CERTIFICATE GENERATION ==========
+  //CERTIFICATE GENERATION
   certificate: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Certificate',
@@ -143,7 +143,7 @@ const activitySchema = new mongoose.Schema({
     index: true
   },
   
-  // ========== CERTIFICATE ISSUER INFO ==========
+  //CERTIFICATE ISSUER INFO
   certificateGeneratedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
@@ -154,7 +154,7 @@ const activitySchema = new mongoose.Schema({
   },
   certificateExpiresAt: Date,
   
-  // ========== VERIFICATION INFO ==========
+  //VERIFICATION INFO
   verificationCode: {
     type: String,
     unique: true,
