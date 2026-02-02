@@ -5,11 +5,10 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 class EmailService {
   async sendCertificateEmail(studentEmail, studentName, certificateData) {
     try {
-      console.log('📧 EMAIL SERVICE CALLED');
+      console.log('EMAIL SERVICE CALLED');
 
       const { certificateId, pdfBuffer, achievement, organizingBody, eventDate, achievementLevel } = certificateData;
 
-      // ✅ FIX: CHECK IF PDFBUFFER EXISTS
       if (!pdfBuffer) {
         throw new Error('pdfBuffer is missing or undefined');
       }
@@ -17,7 +16,6 @@ class EmailService {
       console.log('   PDF Buffer type:', typeof pdfBuffer);
       console.log('   PDF Buffer length:', pdfBuffer.length);
 
-      // ✅ IF ALREADY BASE64 STRING, USE DIRECTLY
       let base64PDF = pdfBuffer;
       if (Buffer.isBuffer(pdfBuffer)) {
         base64PDF = pdfBuffer.toString('base64');
@@ -36,7 +34,7 @@ class EmailService {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🎓 Certificate Issued!</h1>
+              <h1>🎓Certificate Issued!</h1>
             </div>
             <div>
               <p>Dear <strong>${studentName}</strong>,</p>
@@ -66,14 +64,14 @@ class EmailService {
         }]
       };
 
-      console.log('   ✅ Sending email...');
+      console.log('Sending email...');
       const result = await sgMail.send(msg);
-      
-      console.log('✅ Email sent successfully');
+
+      console.log('Email sent successfully');
       return { success: true, messageId: result[0].headers['x-message-id'] };
 
     } catch (error) {
-      console.error('❌ Email service error:', error.message);
+      console.error('Email service error:', error.message);
       return { success: false, error: error.message };
     }
   }
