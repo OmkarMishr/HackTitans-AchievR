@@ -24,12 +24,10 @@ router.post('/register', async (req, res) => {
 
         await user.save();
 
-
         if (role === 'student') {
             const skills = new StudentSkills({ student: user._id });
             await skills.save();
         }
-
         const token = jwt.sign(
             { userId: user._id, role: user.role },
             process.env.JWT_SECRET,
@@ -51,7 +49,6 @@ router.post('/register', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
 
 router.post('/login', async (req, res) => {
     try {

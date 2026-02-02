@@ -12,18 +12,15 @@ const { sendActivityApprovedEmail, sendActivityRejectedEmail } = require('../uti
 
 const router = express.Router();
 
-// ✅ USE MEMORY STORAGE (will save manually)
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// ✅ CREATE UPLOADS FOLDER IF NOT EXISTS
 const uploadDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
-  console.log('📁 Created uploads folder:', uploadDir);
+  console.log('Created uploads folder:', uploadDir);
 }
 
-// ========== SUBMIT ACTIVITY ==========
 router.post('/submit', authMiddleware, upload.single('document'), async (req, res) => {
   try {
     const {
@@ -41,22 +38,22 @@ router.post('/submit', authMiddleware, upload.single('document'), async (req, re
     const studentId = req.user.userId;
 
     console.log('\n' + '='.repeat(70));
-    console.log('📝 ACTIVITY SUBMISSION RECEIVED');
+    console.log('ACTIVITY SUBMISSION RECEIVED');
     console.log('='.repeat(70));
-    console.log('📋 Form Data:');
-    console.log('   Title:', title);
-    console.log('   Category:', category);
-    console.log('   Student ID:', studentId);
+    console.log('Form Data:');
+    console.log('Title:', title);
+    console.log('Category:', category);
+    console.log('Student ID:', studentId);
 
-    // ✅ ADD FILE LOGGING
-    console.log('📁 FILE INFO:');
+    // ADD FILE LOGGING
+    console.log('FILE INFO:');
     if (req.file) {
-      console.log('   ✅ FILE RECEIVED');
-      console.log('   Original name:', req.file.originalname);
-      console.log('   Size:', req.file.size, 'bytes');
-      console.log('   Type:', req.file.mimetype);
+      console.log('FILE RECEIVED');
+      console.log('Original name:', req.file.originalname);
+      console.log('Size:', req.file.size, 'bytes');
+      console.log('Type:', req.file.mimetype);
     } else {
-      console.log('   ⚠️ NO FILE UPLOADED (Optional)');
+      console.log('NO FILE UPLOADED (Optional)');
     }
 
     // Parse skill arrays from JSON strings
@@ -68,7 +65,7 @@ router.post('/submit', authMiddleware, upload.single('document'), async (req, re
       return res.status(400).json({ error: 'Please select at least one skill' });
     }
 
-    // ✅ FIX: SAVE FILE TO DISK
+    //FIX: SAVE FILE TO DISK
     let proofDocuments = [];
     if (req.file) {
       try {
@@ -90,7 +87,7 @@ router.post('/submit', authMiddleware, upload.single('document'), async (req, re
           uploadedAt: new Date()
         }];
       } catch (fileError) {
-        console.error('❌ File save error:', fileError.message);
+        console.error('File save error:', fileError.message);
         return res.status(500).json({ error: 'File upload failed: ' + fileError.message });
       }
     }
@@ -112,13 +109,13 @@ router.post('/submit', authMiddleware, upload.single('document'), async (req, re
     });
 
     await activity.save();
-    console.log('✅ Activity saved:', activity._id);
-    console.log('📄 Proof documents count:', activity.proofDocuments.length);
+    console.log('Activity saved:', activity._id);
+    console.log('Proof documents count:', activity.proofDocuments.length);
 
-    // ========== AI FRAUD DETECTION (if document uploaded) ==========
+    // AI FRAUD DETECTION (if document uploaded)
     if (req.file) {
       try {
-        console.log('🔍 Scanning document for fraud...');
+        console.log('Scanning document for fraud...');
         const fraud = await detectCertificateFraud(req.file.buffer);
 
         const fraudDetection = new FraudDetection({
@@ -137,20 +134,18 @@ router.post('/submit', authMiddleware, upload.single('document'), async (req, re
         if (fraud.recommendation === 'auto_reject') {
           activity.status = 'rejected';
           activity.rejectionReason = `Fraud detected (Score: ${fraud.fraudScore}/100)`;
-          console.warn('⚠️ Activity auto-rejected due to fraud');
+          console.warn('Activity auto-rejected due to fraud');
         } else {
-          console.log('✅ Fraud check passed');
+          console.log('Fraud check passed');
         }
 
         await activity.save();
       } catch (fraudError) {
-        console.error('⚠️ Fraud detection error:', fraudError.message);
+        console.error('Fraud detection error:', fraudError.message);
       }
     }
-
-    // ========== UPDATE STUDENT SKILLS PROFILE ==========
     try {
-      console.log('📊 Updating student skills...');
+      console.log('Updating student skills...');
       let studentSkills = await StudentSkills.findOne({ student: studentId });
       
       if (!studentSkills) {
@@ -196,9 +191,9 @@ router.post('/submit', authMiddleware, upload.single('document'), async (req, re
       studentSkills.lastUpdated = new Date();
 
       await studentSkills.save();
-      console.log('✅ Skills updated');
+      console.log('Skills updated');
     } catch (skillsError) {
-      console.error('⚠️ Skills update error:', skillsError.message);
+      console.error('Skills update error:', skillsError.message);
     }
 
     console.log('='.repeat(70) + '\n');
@@ -219,7 +214,7 @@ router.post('/submit', authMiddleware, upload.single('document'), async (req, re
     });
 
   } catch (error) {
-    console.error('❌ Submit activity error:', error);
+    console.error('Submit activity error:', error);
     console.log('='.repeat(70) + '\n');
     res.status(500).json({ error: error.message });
   }
@@ -235,7 +230,7 @@ router.get('/my-activities', authMiddleware, async (req, res) => {
       .populate('reviewedBy', 'name email')
       .sort({ submittedAt: -1 });
 
-    console.log(`✅ Found ${activities.length} activities`);
+    console.log(`Found ${activities.length} activities`);
 
     res.json({
       success: true,
@@ -243,7 +238,7 @@ router.get('/my-activities', authMiddleware, async (req, res) => {
       activities
     });
   } catch (error) {
-    console.error('❌ Get my activities error:', error);
+    console.error('Get my activities error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -251,13 +246,13 @@ router.get('/my-activities', authMiddleware, async (req, res) => {
 // ========== FACULTY: GET PENDING ACTIVITIES ==========
 router.get('/faculty/pending', authMiddleware, async (req, res) => {
   try {
-    console.log('📋 Fetching pending activities...');
+    console.log('Fetching pending activities...');
 
     const activities = await Activity.find({ status: 'pending' })
       .populate('student', 'name rollNumber department email')
       .sort({ submittedAt: -1 });
 
-    console.log(`✅ Found ${activities.length} pending activities`);
+    console.log(`Found ${activities.length} pending activities`);
 
     res.json({
       success: true,
@@ -265,7 +260,7 @@ router.get('/faculty/pending', authMiddleware, async (req, res) => {
       activities
     });
   } catch (error) {
-    console.error('❌ Get pending activities error:', error);
+    console.error('Get pending activities error:', error);
     res.status(500).json({ error: error.message });
   }
 });
