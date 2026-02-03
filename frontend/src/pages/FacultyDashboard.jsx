@@ -282,7 +282,7 @@ export default function FacultyDashboard() {
                       )}
                       {activity.certificateId && (
                         <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
-                          ✅ Certified
+                           Certified
                         </span>
                       )}
                     </div>
@@ -491,7 +491,7 @@ export default function FacultyDashboard() {
                     <div className="bg-white border-2 border-green-200 rounded-xl p-6 hover:border-green-400 transition duration-300 bg-green-50">
                       <div className="space-y-3">
                         <div>
-                          <p className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-2">✅ Status</p>
+                          <p className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-2"> Status</p>
                           <p className="text-sm text-green-700 font-medium">Approved & Ready</p>
                         </div>
 
@@ -564,7 +564,7 @@ export default function FacultyDashboard() {
                           ) : (
                             <>
                               <CheckCircle className="w-4 h-4" />
-                              ✅ Approve Activity
+                               Approve Activity
                             </>
                           )}
                         </button>
@@ -585,7 +585,7 @@ export default function FacultyDashboard() {
                           ) : (
                             <>
                               <XCircle className="w-4 h-4" />
-                              ❌ Reject Activity
+                               Reject Activity
                             </>
                           )}
                         </button>

@@ -58,7 +58,7 @@ export default function AdminDashboard({ user }) {
 
     } catch (error) {
       console.error('Error fetching activities:', error);
-      alert('❌ Error loading activities: ' + error.message);
+      alert(' Error loading activities: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -67,13 +67,13 @@ export default function AdminDashboard({ user }) {
   // ========== GENERATE CERTIFICATE (UPDATED) ==========
   const handleGenerateCertificate = async (activity) => {
     if (!activity || !activity._id) {
-      alert('❌ Invalid activity');
+      alert(' Invalid activity');
       return;
     }
 
     setCertifying(activity._id);
     try {
-      console.log('📜 Generating certificate for:', activity._id);
+      console.log(' Generating certificate for:', activity._id);
 
       const response = await axios.post(
         `http://localhost:5000/api/certificates/generate/${activity._id}`,
@@ -81,26 +81,26 @@ export default function AdminDashboard({ user }) {
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
 
-      console.log('✅ Certificate Response:', response.data);
-      console.log('✅ PDF Buffer present:', !!response.data.pdfBuffer);
-      console.log('✅ PDF Buffer length:', response.data.pdfBuffer?.length || 'MISSING');
+      console.log(' Certificate Response:', response.data);
+      console.log(' PDF Buffer present:', !!response.data.pdfBuffer);
+      console.log(' PDF Buffer length:', response.data.pdfBuffer?.length || 'MISSING');
 
-      // ✅ STORE FULL RESPONSE IN STATE
+      //  STORE FULL RESPONSE IN STATE
       setCertificateData(response.data);
       setSelectedActivity(activity);
 
       const confirmSend = window.confirm(
-        `✅ Certificate Generated!\n\n📧 Send to: ${response.data.studentEmail}?\n\nClick OK to send email now.`
+        ` Certificate Generated!\n\n Send to: ${response.data.studentEmail}?\n\nClick OK to send email now.`
       );
 
       if (confirmSend) {
-        // ✅ PASS FULL RESPONSE DATA (INCLUDING pdfBuffer)
+        //  PASS FULL RESPONSE DATA (INCLUDING pdfBuffer)
         await handleSubmitAndSendEmail(activity._id, response.data);
       }
 
     } catch (error) {
-      console.error('❌ Error:', error);
-      alert('❌ Error: ' + (error.response?.data?.error || error.message));
+      console.error(' Error:', error);
+      alert(' Error: ' + (error.response?.data?.error || error.message));
     } finally {
       setCertifying(null);
     }
@@ -110,13 +110,13 @@ export default function AdminDashboard({ user }) {
   const handleSubmitAndSendEmail = async (activityId, certData) => {
     setCertifying(activityId);
     try {
-      console.log('📧 Sending email with PDF...');
-      console.log('📋 Certificate Data:', certData);
+      console.log(' Sending email with PDF...');
+      console.log(' Certificate Data:', certData);
 
-      // ✅ IMPORTANT: pdfBuffer MUST be included
+      //  IMPORTANT: pdfBuffer MUST be included
       const payload = {
         certificateId: certData.certificateId,
-        pdfBuffer: certData.pdfBuffer,  // ✅ THIS IS THE FIX
+        pdfBuffer: certData.pdfBuffer,  //  THIS IS THE FIX
         studentName: certData.studentName,
         studentEmail: certData.studentEmail,
         studentId: certData.studentId,
@@ -127,14 +127,14 @@ export default function AdminDashboard({ user }) {
         fileSize: certData.fileSize
       };
 
-      console.log('🔍 Payload check:');
-      console.log('   certificateId:', !!payload.certificateId);
-      console.log('   pdfBuffer:', !!payload.pdfBuffer);
-      console.log('   pdfBuffer length:', payload.pdfBuffer?.length || 'MISSING');
-      console.log('   studentEmail:', !!payload.studentEmail);
+      console.log('Payload check:');
+      console.log(' certificateId:', !!payload.certificateId);
+      console.log('pdfBuffer:', !!payload.pdfBuffer);
+      console.log('pdfBuffer length:', payload.pdfBuffer?.length || 'MISSING');
+      console.log('studentEmail:', !!payload.studentEmail);
 
       if (!payload.pdfBuffer) {
-        alert('❌ ERROR: PDF Buffer is missing!\n\nTry generating certificate again.');
+        alert(' ERROR: PDF Buffer is missing!\n\nTry generating certificate again.');
         setCertifying(null);
         return;
       }
@@ -150,16 +150,16 @@ export default function AdminDashboard({ user }) {
         }
       );
 
-      console.log('✅ Success:', response.data);
-      alert(`✅ Certificate emailed to ${certData.studentEmail}\n\n📎 PDF attached!`);
+      console.log('Success:', response.data);
+      alert(`Certificate emailed to ${certData.studentEmail}\n\n📎 PDF attached!`);
 
       setCertificateData(null);
       setSelectedActivity(null);
       fetchApprovedActivities();
 
     } catch (error) {
-      console.error('❌ Error:', error);
-      alert('❌ Error: ' + (error.response?.data?.error || error.message));
+      console.error('Error:', error);
+      alert(' Error: ' + (error.response?.data?.error || error.message));
     } finally {
       setCertifying(null);
     }
@@ -173,13 +173,13 @@ export default function AdminDashboard({ user }) {
     }
 
     const confirm = window.confirm(
-      `📧 Send certificates to ${selectedStudents.length} student${selectedStudents.length > 1 ? 's' : ''}?\n\nThis will email all pending certificates.`
+      ` Send certificates to ${selectedStudents.length} student${selectedStudents.length > 1 ? 's' : ''}?\n\nThis will email all pending certificates.`
     );
     if (!confirm) return;
 
     setBulkSending(true);
     try {
-      console.log('📧 Bulk sending to', selectedStudents.length, 'students...');
+      console.log(' Bulk sending to', selectedStudents.length, 'students...');
 
       const response = await axios.post(
         'http://localhost:5000/api/certificates/bulk-send',
@@ -187,15 +187,15 @@ export default function AdminDashboard({ user }) {
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
 
-      console.log('✅ Result:', response.data);
-      alert(`✅ Successfully sent ${response.data.successCount} certificates!\n❌ Failed: ${response.data.failCount}`);
+      console.log(' Result:', response.data);
+      alert(` Successfully sent ${response.data.successCount} certificates!\n Failed: ${response.data.failCount}`);
 
       setSelectedStudents([]);
       fetchApprovedActivities();
 
     } catch (error) {
-      console.error('❌ Error:', error);
-      alert('❌ Error: ' + (error.response?.data?.error || error.message));
+      console.error(' Error:', error);
+      alert(' Error: ' + (error.response?.data?.error || error.message));
     } finally {
       setBulkSending(false);
     }
@@ -374,7 +374,7 @@ export default function AdminDashboard({ user }) {
           <div className="flex-1 min-w-250">
             <input
               type="text"
-              placeholder="🔍 Search by student or activity..."
+              placeholder=" Search by student or activity..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-orange-400 focus:outline-none font-medium"

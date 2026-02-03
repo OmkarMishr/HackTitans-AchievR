@@ -15,7 +15,7 @@ export default function VerifyCertificate() {
     e.preventDefault();
     
     if (!certificateId.trim()) {
-      setError('⚠️ Please enter a certificate ID');
+      setError('Please enter a certificate ID');
       return;
     }
 
@@ -25,14 +25,14 @@ export default function VerifyCertificate() {
       setVerified(null);
       setCertificateData(null);
 
-      console.log('🔍 Verifying certificate:', certificateId);
+      console.log('Verifying certificate:', certificateId);
 
-      // ✅ CORRECT BACKEND URL
+      // CORRECT BACKEND URL
       const response = await axios.get(
         `http://localhost:5000/api/certificates/verify/${certificateId}`
       );
 
-      console.log('✅ Response:', response.data);
+      console.log('Response:', response.data);
 
       if (response.data.verified) {
         setVerified(true);
@@ -42,14 +42,14 @@ export default function VerifyCertificate() {
         setError(response.data.message || 'Certificate verification failed');
       }
     } catch (err) {
-      console.error('❌ Error:', err);
+      console.error('Error:', err);
       setVerified(false);
       
       // Better error handling
       if (err.response?.status === 404) {
-        setError('❌ Certificate not found');
+        setError('Certificate not found');
       } else if (err.response?.status === 403) {
-        setError('❌ Certificate is invalid or revoked');
+        setError('Certificate is invalid or revoked');
       } else {
         setError(err.response?.data?.message || err.message || 'Failed to verify certificate');
       }
@@ -98,7 +98,7 @@ export default function VerifyCertificate() {
                   Verifying...
                 </>
               ) : (
-                '🔍 Verify'
+                'Verify'
               )}
             </button>
           </div>
@@ -122,7 +122,7 @@ export default function VerifyCertificate() {
             <div className="flex items-center gap-3 pb-6 border-b-2 border-green-200">
               <CheckCircle className="w-8 h-8 text-green-600" />
               <h2 className="text-3xl font-light text-green-900">
-                ✅ Certificate Verified & Valid
+                Certificate Verified & Valid
               </h2>
             </div>
 
@@ -141,7 +141,7 @@ export default function VerifyCertificate() {
               {/* Email */}
               <div className="bg-white rounded-lg p-4 border border-green-200 hover:shadow-lg transition">
                 <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">
-                  📧 Email
+                  Email
                 </p>
                 <div className="flex items-center justify-between mt-2">
                   <p className="text-lg text-gray-900 font-light break-all">
@@ -169,7 +169,7 @@ export default function VerifyCertificate() {
               {/* Achievement */}
               <div className="bg-white rounded-lg p-4 border border-green-200 hover:shadow-lg transition">
                 <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">
-                  🏆 Achievement
+                  Achievement
                 </p>
                 <p className="text-lg text-gray-900 font-light mt-2">
                   {certificateData.achievement || 'N/A'}
@@ -179,7 +179,7 @@ export default function VerifyCertificate() {
               {/* Category */}
               <div className="bg-white rounded-lg p-4 border border-green-200 hover:shadow-lg transition">
                 <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">
-                  📂 Category
+                  Category
                 </p>
                 <p className="text-lg text-gray-900 font-light mt-2">
                   {certificateData.achievementCategory || 'N/A'}
@@ -189,7 +189,7 @@ export default function VerifyCertificate() {
               {/* Level */}
               <div className="bg-white rounded-lg p-4 border border-green-200 hover:shadow-lg transition">
                 <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">
-                  📊 Level
+                  Level
                 </p>
                 <p className="text-lg font-light mt-2">
                   <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full">
@@ -201,7 +201,7 @@ export default function VerifyCertificate() {
               {/* Issued Date */}
               <div className="bg-white rounded-lg p-4 border border-green-200 hover:shadow-lg transition">
                 <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">
-                  📅 Issued Date
+                  Issued Date
                 </p>
                 <p className="text-lg text-gray-900 font-light mt-2">
                   {certificateData.issuedDate
@@ -213,7 +213,7 @@ export default function VerifyCertificate() {
               {/* Expires Date */}
               <div className="bg-white rounded-lg p-4 border border-green-200 hover:shadow-lg transition">
                 <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">
-                  ⏰ Expires Date
+                  Expires Date
                 </p>
                 <p className="text-lg text-gray-900 font-light mt-2">
                   {certificateData.expiresDate
@@ -225,7 +225,7 @@ export default function VerifyCertificate() {
               {/* Status */}
               <div className="bg-white rounded-lg p-4 border border-green-200 hover:shadow-lg transition">
                 <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">
-                  ✔️ Status
+                  Status
                 </p>
                 <p className="text-lg font-light mt-2">
                   <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full">
@@ -239,7 +239,7 @@ export default function VerifyCertificate() {
               {/* Verification Count */}
               <div className="bg-white rounded-lg p-4 border border-green-200 hover:shadow-lg transition">
                 <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">
-                  🔍 Verification Count
+                  Verification Count
                 </p>
                 <p className="text-lg text-gray-900 font-light mt-2">
                   {certificateData.verificationCount || 0} times verified
@@ -251,7 +251,7 @@ export default function VerifyCertificate() {
             {certificateData.organizingBody && (
               <div className="bg-white rounded-lg p-6 border border-green-200 hover:shadow-lg transition">
                 <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-2">
-                  🏢 Organizing Body
+                  Organizing Body
                 </p>
                 <p className="text-lg text-gray-900 font-light">
                   {certificateData.organizingBody}
@@ -262,7 +262,7 @@ export default function VerifyCertificate() {
             {/* Issued By */}
             <div className="bg-white rounded-lg p-6 border border-green-200 hover:shadow-lg transition">
               <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-2">
-                👥 Issued By
+                Issued By
               </p>
               <p className="text-lg text-gray-900 font-light">
                 {certificateData.issuedBy || 'N/A'}
@@ -272,7 +272,7 @@ export default function VerifyCertificate() {
             {/* Success Message */}
             <div className="bg-green-100 border-2 border-green-400 rounded-lg p-4 text-center">
               <p className="text-green-800 font-light">
-                ✅ This certificate has been verified and is authentic!
+                This certificate has been verified and is authentic!
               </p>
             </div>
           </div>
