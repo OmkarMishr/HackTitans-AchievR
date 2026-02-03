@@ -222,9 +222,9 @@ activitySchema.pre('save', async function(next) {
       const year = new Date().getFullYear();
       const count = await this.constructor.countDocuments();
       this.activityId = `ACT-${year}-${String(count + 1).padStart(6, '0')}`;
-      console.log(`✅ Generated Activity ID: ${this.activityId}`);
+      console.log(`Generated Activity ID: ${this.activityId}`);
     } catch (error) {
-      console.error('❌ Error generating activityId:', error);
+      console.error('Error generating activityId:', error);
       next(error);
       return;
     }
@@ -233,7 +233,7 @@ activitySchema.pre('save', async function(next) {
   next();
 });
 
-// ========== INDEXES FOR PERFORMANCE ==========
+// INDEXES FOR PERFORMANCE
 activitySchema.index({ student: 1, createdAt: -1 });
 activitySchema.index({ status: 1, createdAt: -1 });
 activitySchema.index({ category: 1, achievementLevel: 1 });
@@ -241,8 +241,6 @@ activitySchema.index({ certificateId: 1 });
 activitySchema.index({ verificationCode: 1 });
 activitySchema.index({ eventDate: -1 });
 activitySchema.index({ emailStatus: 1 });
-
-// ========== VIRTUAL FIELDS ==========
 
 // Check if certified
 activitySchema.virtual('isCertified').get(function() {
@@ -292,15 +290,13 @@ activitySchema.virtual('certificateExpiryStatus').get(function() {
   return `${daysLeft} days left`;
 });
 
-// ========== INSTANCE METHODS ==========
-
 // Approve activity
 activitySchema.methods.approve = function(facultyId, comment) {
   this.status = 'approved';
   this.reviewedBy = facultyId;
   this.facultyComment = comment;
   this.reviewedAt = new Date();
-  console.log(`✅ Activity approved: ${this._id}`);
+  console.log(`Activity approved: ${this._id}`);
   return this.save();
 };
 
@@ -311,7 +307,7 @@ activitySchema.methods.reject = function(facultyId, reason) {
   this.rejectedAt = new Date();
   this.reviewedBy = facultyId;
   this.reviewedAt = new Date();
-  console.log(`❌ Activity rejected: ${this._id}`);
+  console.log(`Activity rejected: ${this._id}`);
   return this.save();
 };
 
@@ -320,7 +316,7 @@ activitySchema.methods.flag = function(reason) {
   this.status = 'flagged';
   this.facultyComment = reason;
   this.reviewedAt = new Date();
-  console.log(`🚩 Activity flagged: ${this._id}`);
+  console.log(`Activity flagged: ${this._id}`);
   return this.save();
 };
 
@@ -335,7 +331,7 @@ activitySchema.methods.updateCertificate = function(certificateData) {
   this.certificateHash = certificateData.certificateHash;
   this.certificateGeneratedAt = new Date();
   this.status = 'certified';
-  console.log(`📜 Certificate added: ${this.certificateId}`);
+  console.log(`Certificate added: ${this.certificateId}`);
   return this.save();
 };
 
@@ -351,7 +347,7 @@ activitySchema.methods.updateEmailStatus = function(status, failureReason = null
   if (status === 'failed') {
     this.emailResendCount += 1;
   }
-  console.log(`📧 Email status updated: ${status}`);
+  console.log(`Email status updated: ${status}`);
   return this.save();
 };
 
@@ -424,8 +420,6 @@ activitySchema.methods.getDetailedStats = function() {
     }
   };
 };
-
-// ========== STATIC METHODS ==========
 
 // Find by student
 activitySchema.statics.findByStudent = function(studentId) {
@@ -561,5 +555,4 @@ activitySchema.statics.getDashboardStats = function() {
   ]);
 };
 
-// ========== EXPORT ==========
 module.exports = mongoose.model('Activity', activitySchema);

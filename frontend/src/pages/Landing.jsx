@@ -43,13 +43,13 @@ export default function PremiumAchievRLanding({ user, setUser }) {
             <img src={achievrLogo} alt="AchievR Logo" className="h-22 w-auto" />
           </div>
           <div className="flex gap-8 items-center">
-            <button 
+            <button
               className="text-sm text-gray-600 hover:text-gray-900 transition duration-300 rounded-b-full"
               onClick={handleDashboardClick}
             >
               Dashboard
             </button>
-            
+
             {user ? (
               <div className="relative">
                 <button
@@ -59,7 +59,7 @@ export default function PremiumAchievRLanding({ user, setUser }) {
                   <User size={16} />
                   <span>{user.name}</span>
                 </button>
-                
+
                 {showDropdown && (
                   <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-2xl border border-gray-200 py-2 z-50">
                     <div className="px-4 py-3 border-b border-gray-100">
@@ -85,7 +85,7 @@ export default function PremiumAchievRLanding({ user, setUser }) {
                 )}
               </div>
             ) : (
-              <button 
+              <button
                 onClick={() => navigate('/login')}
                 className="px-6 py-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-none hover:from-orange-700 hover:to-orange-600 transition duration-300 text-sm font-medium shadow-lg shadow-orange-500/20 rounded-xl"
               >
@@ -113,7 +113,7 @@ export default function PremiumAchievRLanding({ user, setUser }) {
           }}
         />
 
-        <div className="max-w-full mx-auto relative z-10">
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
           {/* Grid Layout: 2/3 Text Left, 1/3 Hat Right */}
           <div className="grid grid-cols-3 gap-0 items-start mb-8">
 
@@ -139,8 +139,8 @@ export default function PremiumAchievRLanding({ user, setUser }) {
 
           {/* Bottom Section: Description & Button */}
           <div className="flex flex-col gap-6 items-center mb-8 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
-            
-            <button 
+
+            <button
               onClick={() => navigate(user ? (user.role === 'student' ? '/dashboard' : `/${user.role}`) : '/register')}
               className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:from-orange-700 hover:to-orange-600 transition duration-300 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105"
             >
@@ -162,42 +162,55 @@ export default function PremiumAchievRLanding({ user, setUser }) {
       {/* 4 Steps Section */}
       <section className="py-32 px-8 bg-white">
         <div className="max-w-6xl mx-auto">
+
           <div className="text-center mb-20">
-            <h2 className="text-5xl font-light mb-4 text-gray-900">4 Simple Steps</h2>
-            <p className="text-gray-600 font-light">Get your achievement verified in minutes</p>
+            <h2 className="text-5xl font-light text-gray-900 mb-4"> 4 Simple Steps </h2>
+            <p className="text-gray-600 font-light"> Get your achievement verified in minutes </p>
           </div>
 
+          {/* Steps Grid */}
           <div className="grid md:grid-cols-4 gap-8">
             {[
               {
-                num: '01',
-                title: 'Submit Achievement',
-                desc: 'Upload certificate, select skills, add context'
+                num: "01",
+                title: "Submit Achievement",
+                desc: "Upload certificate, select skills, add context",
               },
               {
-                num: '02',
-                title: 'Faculty Approval',
-                desc: 'One-click approval with comments workflow`'
+                num: "02",
+                title: "Faculty Approval",
+                desc: "One-click approval with comments workflow",
               },
               {
-                num: '03',
-                title: 'Get Certified',
-                desc: 'QR code, shareable proof, searchable profile'
+                num: "03",
+                title: "Get Certified",
+                desc: "QR code, shareable proof, searchable profile",
               },
               {
-                num: '04',
-                title: 'Share Portfolio',
-                desc: 'Showcase your verified skills and achievements'
-              }
-            ].map((step, idx) => (
-              <div key={idx} className="relative group">
-                <div className="bg-gradient-to-br from-orange-50 to-white p-8 rounded-xl border-2 border-gray-200 hover:border-orange-400 transition duration-300 hover:shadow-lg transform hover:scale-105">
-                  <div className="text-5xl font-bold text-orange-200 mb-4 group-hover:text-orange-400 transition">{step.num}</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-orange-600 transition">{step.title}</h3>
-                  <p className="text-gray-600 font-light leading-relaxed">{step.desc}</p>
+                num: "04",
+                title: "Share Portfolio",
+                desc: "Showcase your verified skills and achievements",
+              },
+            ].map((step, idx, arr) => (
+              <div key={step.num} className="relative group">
+
+                {/* Step Card */}
+                <div className="p-8 rounded-xl border-2 border-gray-200 bg-gradient-to-br from-orange-50 to-white transition duration-300 hover:border-orange-400 hover:shadow-lg hover:scale-105">
+
+                  <div className="text-5xl font-bold text-orange-200 mb-4 group-hover:text-orange-400 transition"> {step.num} </div>
+
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-orange-600 transition">
+                    {step.title}
+                  </h3>
+
+                  <p className="text-gray-600 font-light leading-relaxed">
+                    {step.desc}
+                  </p>
                 </div>
-                {idx < 3 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
+
+                {/* Arrow Between Steps */}
+                {idx !== arr.length - 1 && (
+                  <div className="hidden md:block absolute top-1/2 -right-4 -translate-y-1/2 z-10">
                     <ArrowRight size={24} className="text-orange-300 group-hover:text-orange-400 transition" />
                   </div>
                 )}
@@ -207,6 +220,7 @@ export default function PremiumAchievRLanding({ user, setUser }) {
         </div>
       </section>
 
+
       {/* Divider */}
       <div className="h-px bg-gradient-to-r from-transparent via-orange-300 to-transparent" />
 
@@ -215,8 +229,7 @@ export default function PremiumAchievRLanding({ user, setUser }) {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="animate-slideInLeft">
-              <h2 className="text-5xl font-light mb-8 leading-tight text-gray-900">
-                The Problem with
+              <h2 className="text-5xl font-light mb-8 leading-tight text-gray-900">The Problem with
                 <span className="block bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent font-normal"> Traditional Verification</span>
               </h2>
               <div className="space-y-6">
@@ -269,9 +282,8 @@ export default function PremiumAchievRLanding({ user, setUser }) {
       {/* Testimonials - Grey Background */}
       <section className="py-32 px-8 bg-gradient-to-br from-gray-100 via-white to-gray-50">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl font-light mb-16 text-gray-900">
-            Trusted by
-            <span className="block bg-gradient-to-r from-orange-700 to-orange-600 bg-clip-text text-transparent font-normal"> Leading Institutions</span>
+          <h2 className="text-5xl font-light mb-16 text-gray-900">Trusted by
+            <span className="block bg-gradient-to-r from-orange-700 to-orange-600 bg-clip-text text-transparent font-normal">Leading Institutions</span>
           </h2>
 
           <div className="grid md:grid-cols-2 gap-12">
@@ -326,11 +338,10 @@ export default function PremiumAchievRLanding({ user, setUser }) {
           <p className="text-lg text-gray-300 font-light mb-8 max-w-2xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
             Join institutions securing their future with military-grade credential verification.
           </p>
-          <button 
+          <button
             onClick={() => navigate(user ? (user.role === 'student' ? '/dashboard' : `/${user.role}`) : '/register')}
-            className="inline-flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:from-orange-700 hover:to-orange-600 transition duration-300 font-medium shadow-xl shadow-orange-500/50 hover:shadow-orange-500/70 hover:scale-105 animate-fadeInUp" 
-            style={{ animationDelay: '0.2s' }}
-          >
+            className="inline-flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:from-orange-700 hover:to-orange-600 transition duration-300 font-medium shadow-xl shadow-orange-500/50 hover:shadow-orange-500/70 hover:scale-105 animate-fadeInUp"
+            style={{ animationDelay: '0.2s' }}>
             {user ? 'Go to Dashboard' : 'Request Demo'}
             <ArrowRight size={16} />
           </button>
@@ -380,7 +391,7 @@ export default function PremiumAchievRLanding({ user, setUser }) {
 
           <div className="border-t border-gray-200 pt-8 text-center">
             <p className="text-xs text-gray-600 font-light">
-              © 2025 AchievR. All right reserved Developed by Hack Titans
+              © 2025 AchievR. All right reserved Developed by Hack Titans (Shashank & Omkar)
             </p>
           </div>
         </div>
