@@ -25,12 +25,10 @@ export default function AdminDashboard({ user }) {
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [bulkSending, setBulkSending] = useState(false);
 
-  // ========== LIFECYCLE ==========
   useEffect(() => {
     fetchApprovedActivities();
   }, []);
 
-  // ========== FETCH APPROVED ACTIVITIES ==========
   const fetchApprovedActivities = async () => {
     try {
       setLoading(true);
@@ -64,144 +62,38 @@ export default function AdminDashboard({ user }) {
     }
   };
 
-  // ========== GENERATE CERTIFICATE (UPDATED) ==========
   const handleGenerateCertificate = async (activity) => {
     if (!activity || !activity._id) {
-      alert(' Invalid activity');
+      alert('Invalid activity');
       return;
     }
 
     setCertifying(activity._id);
-    try {
-      console.log(' Generating certificate for:', activity._id);
 
+    try {
       const response = await axios.post(
         `http://localhost:5000/api/certificates/generate/${activity._id}`,
         {},
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
-
-      console.log(' Certificate Response:', response.data);
-      console.log(' PDF Buffer present:', !!response.data.pdfBuffer);
-      console.log(' PDF Buffer length:', response.data.pdfBuffer?.length || 'MISSING');
-
-      //  STORE FULL RESPONSE IN STATE
-      setCertificateData(response.data);
-      setSelectedActivity(activity);
-
-      const confirmSend = window.confirm(
-        ` Certificate Generated!\n\n Send to: ${response.data.studentEmail}?\n\nClick OK to send email now.`
-      );
-
-      if (confirmSend) {
-        //  PASS FULL RESPONSE DATA (INCLUDING pdfBuffer)
-        await handleSubmitAndSendEmail(activity._id, response.data);
-      }
-
-    } catch (error) {
-      console.error(' Error:', error);
-      alert(' Error: ' + (error.response?.data?.error || error.message));
-    } finally {
-      setCertifying(null);
-    }
-  };
-
-  // ========== SUBMIT & SEND EMAIL (UPDATED) ==========
-  const handleSubmitAndSendEmail = async (activityId, certData) => {
-    setCertifying(activityId);
-    try {
-      console.log(' Sending email with PDF...');
-      console.log(' Certificate Data:', certData);
-
-      //  IMPORTANT: pdfBuffer MUST be included
-      const payload = {
-        certificateId: certData.certificateId,
-        pdfBuffer: certData.pdfBuffer,  //  THIS IS THE FIX
-        studentName: certData.studentName,
-        studentEmail: certData.studentEmail,
-        studentId: certData.studentId,
-        achievement: certData.achievement,
-        organizingBody: certData.organizingBody || 'Unknown',
-        achievementLevel: certData.achievementLevel || 'College',
-        eventDate: certData.eventDate,
-        fileSize: certData.fileSize
-      };
-
-      console.log('Payload check:');
-      console.log(' certificateId:', !!payload.certificateId);
-      console.log('pdfBuffer:', !!payload.pdfBuffer);
-      console.log('pdfBuffer length:', payload.pdfBuffer?.length || 'MISSING');
-      console.log('studentEmail:', !!payload.studentEmail);
-
-      if (!payload.pdfBuffer) {
-        alert(' ERROR: PDF Buffer is missing!\n\nTry generating certificate again.');
-        setCertifying(null);
-        return;
-      }
-
-      const response = await axios.post(
-        `http://localhost:5000/api/certificates/submit/${activityId}`,
-        payload,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${localStorage.getItem('token')}`
           }
         }
       );
 
-      console.log('Success:', response.data);
-      alert(`Certificate emailed to ${certData.studentEmail}\n\n📎 PDF attached!`);
+      alert("Certificate Generated Successfully");
 
-      setCertificateData(null);
-      setSelectedActivity(null);
+      // refresh list
       fetchApprovedActivities();
 
     } catch (error) {
-      console.error('Error:', error);
-      alert(' Error: ' + (error.response?.data?.error || error.message));
+      console.error(error);
+      alert(error.response?.data?.error || "Failed to generate certificate");
     } finally {
       setCertifying(null);
     }
   };
 
-  // ========== BULK SEND ==========
-  const handleBulkSend = async () => {
-    if (selectedStudents.length === 0) {
-      alert('Please select at least one student');
-      return;
-    }
-
-    const confirm = window.confirm(
-      ` Send certificates to ${selectedStudents.length} student${selectedStudents.length > 1 ? 's' : ''}?\n\nThis will email all pending certificates.`
-    );
-    if (!confirm) return;
-
-    setBulkSending(true);
-    try {
-      console.log(' Bulk sending to', selectedStudents.length, 'students...');
-
-      const response = await axios.post(
-        'http://localhost:5000/api/certificates/bulk-send',
-        { studentIds: selectedStudents },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
-
-      console.log(' Result:', response.data);
-      alert(` Successfully sent ${response.data.successCount} certificates!\n Failed: ${response.data.failCount}`);
-
-      setSelectedStudents([]);
-      fetchApprovedActivities();
-
-    } catch (error) {
-      console.error(' Error:', error);
-      alert(' Error: ' + (error.response?.data?.error || error.message));
-    } finally {
-      setBulkSending(false);
-    }
-  };
-
-  // ========== TOGGLE SELECT ALL ==========
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       const validStudentIds = filteredActivities
@@ -213,7 +105,6 @@ export default function AdminDashboard({ user }) {
     }
   };
 
-  // ========== TOGGLE STUDENT SELECT ==========
   const handleToggleStudent = (studentId) => {
     if (!studentId) return;
 
@@ -224,7 +115,7 @@ export default function AdminDashboard({ user }) {
     }
   };
 
-  // ========== FILTER & SORT ==========
+  //FILTER & SORT 
   const filteredActivities = activities
     .filter(activity => {
       if (!activity) return false;
@@ -254,7 +145,7 @@ export default function AdminDashboard({ user }) {
       return 0;
     });
 
-  // ========== LOADING ==========
+  //lOADING 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gradient-to-br from-gray-50 to-white">
@@ -265,13 +156,11 @@ export default function AdminDashboard({ user }) {
       </div>
     );
   }
-
-  // ========== RENDER ==========
+  // RENDER 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       <div className="max-w-7xl mx-auto px-8 py-12">
 
-        {/* ========== HEADER ========== */}
         <div className="mb-12 flex items-center justify-between">
           <div>
             <h1 className="text-3xl md:text-5xl font-light text-gray-900 mb-3"> Admin Dashboard</h1>
@@ -480,8 +369,8 @@ export default function AdminDashboard({ user }) {
                         </td>
                         <td className="p-4">
                           <span className={`px-3 py-1 text-xs font-bold rounded-full ${activity.certificateId
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-yellow-100 text-yellow-700'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-yellow-100 text-yellow-700'
                             }`}>
                             {activity.certificateId ? 'Certified' : 'Pending'}
                           </span>

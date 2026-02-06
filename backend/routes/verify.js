@@ -2,7 +2,6 @@
 const express = require('express');
 const multer = require('multer');
 const Activity = require('../models/Activity');
-const FraudDetection = require('../models/FraudDetection');
 const StudentSkills = require('../models/StudentSkills');
 const User = require('../models/User');
 const { detectCertificateFraud } = require('../utils/aiService');
@@ -211,7 +210,7 @@ router.put('/:id/approve', async (req, res) => {
       return res.status(400).json({ error: 'Activity ID is required' });
     }
 
-    console.log('📝 Approving activity:', activityId);
+    console.log('Approving activity:', activityId);
 
     // Find and update activity
     const activity = await Activity.findByIdAndUpdate(
@@ -227,36 +226,36 @@ router.put('/:id/approve', async (req, res) => {
 
     // Check if activity exists
     if (!activity) {
-      console.error('❌ Activity not found:', activityId);
+      console.error('Activity not found:', activityId);
       return res.status(404).json({ error: 'Activity not found' });
     }
 
-    console.log('✅ Activity updated:', activity._id);
+    console.log('Activity updated:', activity._id);
 
     // Check if student exists
     if (!activity.student) {
-      console.error('⚠️ Student not populated for activity:', activityId);
+      console.error('Student not populated for activity:', activityId);
       return res.status(400).json({ error: 'Student data not found' });
     }
 
     // Send approval email (wrapped in try-catch)
     try {
       if (activity.student.email) {
-        console.log('📧 Sending approval email to:', activity.student.email);
+        console.log('Sending approval email to:', activity.student.email);
         await sendActivityApprovedEmail(activity.student, activity);
-        console.log('✅ Email sent successfully');
+        console.log('Email sent successfully');
       } else {
-        console.warn('⚠️ Student email not found:', activity.student._id);
+        console.warn('Student email not found:', activity.student._id);
       }
     } catch (emailError) {
-      console.error('⚠️ Email sending failed:', emailError.message);
+      console.error('Email sending failed:', emailError.message);
       // Don't fail the entire approval if email fails
       // Activity is still approved, just email didn't send
     }
 
     res.json({
       success: true,
-      message: '✅ Activity approved!',
+      message: 'Activity approved!',
       activity: {
         id: activity._id,
         title: activity.title,
@@ -267,7 +266,7 @@ router.put('/:id/approve', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Approve activity error:', error.message);
+    console.error('Approve activity error:', error.message);
     res.status(500).json({
       error: error.message,
       details: process.env.NODE_ENV === 'development' ? error.stack : 'Internal error'
@@ -289,7 +288,7 @@ router.put('/:id/reject', async (req, res) => {
       return res.status(400).json({ error: 'Rejection reason is required' });
     }
 
-    console.log('📝 Rejecting activity:', activityId);
+    console.log('Rejecting activity:', activityId);
 
     const activity = await Activity.findByIdAndUpdate(
       activityId,
