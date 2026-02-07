@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api/apiClient';
 import { 
   FileCheck, User, Calendar, Award, CheckCircle, XCircle, Loader, FileText, 
   AlertCircle, ExternalLink, Download, Eye, QrCode, Printer 
 } from 'lucide-react';
+
 
 export default function FacultyDashboard() {
   const [activities, setActivities] = useState([]);
@@ -14,10 +15,13 @@ export default function FacultyDashboard() {
   const [generatingCert, setGeneratingCert] = useState(false);
   const [error, setError] = useState(null);
 
+
   useEffect(() => {
     fetchPendingActivities();
   }, []);
 
+
+  // ⬇️ UPDATED: Using apiClient
   const fetchPendingActivities = async () => {
     try {
       setLoading(true);
@@ -29,9 +33,7 @@ export default function FacultyDashboard() {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/api/activities/faculty/pending', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await apiClient.get('/activities/faculty/pending');
 
       setActivities(response.data.activities || []);
     } catch (error) {
@@ -42,6 +44,8 @@ export default function FacultyDashboard() {
     }
   };
 
+
+  // ⬇️ UPDATED: Removed manual headers
   const handleApprove = async (activityId) => {
     if (!activityId) {
       alert('Activity ID is missing');
@@ -61,11 +65,7 @@ export default function FacultyDashboard() {
         return;
       }
 
-      const response = await axios.put(
-        `http://localhost:5000/api/activities/${activityId}/approve`,
-        { comment },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await apiClient.put(`/activities/${activityId}/approve`, { comment });
 
       alert('Activity approved successfully!');
       setSelectedActivity(null);
@@ -79,6 +79,8 @@ export default function FacultyDashboard() {
     }
   };
 
+
+  //  Removed manual headers
   const handleReject = async (activityId, reason) => {
     if (!activityId) {
       alert('Activity ID is missing');
@@ -98,11 +100,7 @@ export default function FacultyDashboard() {
         return;
       }
 
-      const response = await axios.put(
-        `http://localhost:5000/api/activities/${activityId}/reject`,
-        { reason },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await apiClient.put(`/activities/${activityId}/reject`, { reason });
 
       alert('Activity rejected!');
       setSelectedActivity(null);
@@ -115,6 +113,8 @@ export default function FacultyDashboard() {
     }
   };
 
+
+  // Removed manual headers
   const handleGenerateCertificate = async (activityId) => {
     if (!activityId) {
       alert('Activity ID is missing');
@@ -129,11 +129,7 @@ export default function FacultyDashboard() {
         return;
       }
 
-      const response = await axios.post(
-        `http://localhost:5000/api/certificates/generate/${activityId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await apiClient.post(`/certificates/generate/${activityId}`);
 
       alert('Certificate with QR code generated successfully!');
       
@@ -153,12 +149,16 @@ export default function FacultyDashboard() {
   };
 
   const handleDownloadCertificate = (certificateId) => {
-    window.location.href = `http://localhost:5000/api/certificates/download/${certificateId}`;
+    const baseURL = import.meta.env.VITE_API_URL.replace('/api', ''); 
+    window.location.href = `${baseURL}/api/certificates/download/${certificateId}`;
   };
 
+
   const handleViewCertificate = (certificateId) => {
-    window.open(`http://localhost:3000/verify/${certificateId}`, '_blank');
+    const frontendURL = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+    window.open(`${frontendURL}/verify/${certificateId}`, '_blank');
   };
+
 
   if (loading) {
     return (
@@ -170,6 +170,7 @@ export default function FacultyDashboard() {
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 font-sans">
@@ -183,6 +184,7 @@ export default function FacultyDashboard() {
           </div>
         </div>
 
+
         {error && (
           <div className="mb-8 bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
@@ -195,6 +197,7 @@ export default function FacultyDashboard() {
             </button>
           </div>
         )}
+
 
         <div className="mb-8">
           <div className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-orange-400 transition duration-300 shadow-lg">
@@ -215,12 +218,14 @@ export default function FacultyDashboard() {
           </div>
         </div>
 
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center gap-3 mb-4">
               <FileText className="w-6 h-6 text-orange-600" />
               <h2 className="text-2xl font-light text-gray-900">Pending Activities</h2>
             </div>
+
 
             {activities.length === 0 ? (
               <div className="bg-white border-2 border-gray-200 rounded-xl p-12 text-center">
@@ -292,6 +297,7 @@ export default function FacultyDashboard() {
             )}
           </div>
 
+
           <div className="space-y-6">
             {selectedActivity ? (
               <>
@@ -299,6 +305,7 @@ export default function FacultyDashboard() {
                   <Award className="w-6 h-6 text-orange-600" />
                   <h2 className="text-2xl font-light text-gray-900">Review Activity</h2>
                 </div>
+
 
                 <div className="space-y-4">
                   {/* Activity Details */}
@@ -309,12 +316,14 @@ export default function FacultyDashboard() {
                         <p className="text-gray-900 font-light">{selectedActivity.title}</p>
                       </div>
 
+
                       <div>
                         <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Student</p>
                         <p className="text-gray-900 font-light">{selectedActivity.student?.name || 'Unknown'}</p>
                         <p className="text-sm text-gray-600 font-light">{selectedActivity.student?.rollNumber || 'N/A'}</p>
                         <p className="text-sm text-gray-600 font-light">{selectedActivity.student?.email || 'N/A'}</p>
                       </div>
+
 
                       <div>
                         <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Description</p>
@@ -323,12 +332,14 @@ export default function FacultyDashboard() {
                         </p>
                       </div>
 
+
                       {selectedActivity.organizingBody && (
                         <div>
                           <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Organizing Body</p>
                           <p className="text-gray-900 font-light">{selectedActivity.organizingBody}</p>
                         </div>
                       )}
+
 
                       <div>
                         <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Event Date</p>
@@ -341,7 +352,8 @@ export default function FacultyDashboard() {
                     </div>
                   </div>
 
-                  {/* Proof Documents Section */}
+
+                  {/* Proof Documents Section - UPDATED */}
                   {selectedActivity?.proofDocuments && Array.isArray(selectedActivity.proofDocuments) && selectedActivity.proofDocuments.length > 0 ? (
                     <div className="bg-white border-2 border-blue-200 rounded-xl p-6 hover:border-blue-400 transition duration-300 bg-blue-50">
                       <div className="space-y-3">
@@ -353,71 +365,72 @@ export default function FacultyDashboard() {
                         </div>
                         
                         <div className="space-y-2">
-                          {selectedActivity.proofDocuments.map((doc, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between p-4 bg-white border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:shadow-md transition"
-                            >
-                              <div className="flex items-center gap-3 flex-1 min-w-0">
-                                <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                                  <FileText className="w-5 h-5 text-blue-600" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-gray-900 truncate">
-                                    {doc.filename || `Document ${index + 1}`}
-                                  </p>
-                                  <p className="text-xs text-gray-500">
-                                    Uploaded: {doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString() : 'N/A'}
-                                  </p>
-                                  {doc.fileSize && (
-                                    <p className="text-xs text-gray-500">
-                                      Size: {(doc.fileSize / 1024).toFixed(2)} KB
+                          {selectedActivity.proofDocuments.map((doc, index) => {
+                            // ⬇️ UPDATED: Using environment variable
+                            const baseURL = import.meta.env.VITE_API_URL.replace('/api', '');
+                            const url = doc.url || doc.path;
+                            const fullUrl = url 
+                              ? (url.startsWith('http') ? url : `${baseURL}${url.startsWith('/') ? url : '/' + url}`)
+                              : null;
+
+                            return (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between p-4 bg-white border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:shadow-md transition"
+                              >
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                  <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                                    <FileText className="w-5 h-5 text-blue-600" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                      {doc.filename || `Document ${index + 1}`}
                                     </p>
-                                  )}
+                                    <p className="text-xs text-gray-500">
+                                      Uploaded: {doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString() : 'N/A'}
+                                    </p>
+                                    {doc.fileSize && (
+                                      <p className="text-xs text-gray-500">
+                                        Size: {(doc.fileSize / 1024).toFixed(2)} KB
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-2 ml-4">
+                                  <button
+                                    onClick={() => {
+                                      if (fullUrl) {
+                                        window.open(fullUrl, '_blank');
+                                      } else {
+                                        alert('Document URL not available');
+                                      }
+                                    }}
+                                    className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                                    title="View Document"
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                    View
+                                  </button>
+                                  
+                                  <button
+                                    onClick={() => {
+                                      if (fullUrl) {
+                                        window.location.href = fullUrl;
+                                      } else {
+                                        alert('Document URL not available');
+                                      }
+                                    }}
+                                    className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
+                                    title="Download Document"
+                                  >
+                                    <Download className="w-4 h-4" />
+                                    Download
+                                  </button>
                                 </div>
                               </div>
-                              
-                              <div className="flex items-center gap-2 ml-4">
-                                <button
-                                  onClick={() => {
-                                    const url = doc.url || doc.path;
-                                    if (url) {
-                                      const fullUrl = url.startsWith('http') 
-                                        ? url 
-                                        : `http://localhost:5000${url.startsWith('/') ? url : '/' + url}`;
-                                      window.open(fullUrl, '_blank');
-                                    } else {
-                                      alert('Document URL not available');
-                                    }
-                                  }}
-                                  className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
-                                  title="View Document"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                  View
-                                </button>
-                                
-                                <button
-                                  onClick={() => {
-                                    const url = doc.url || doc.path;
-                                    if (url) {
-                                      const fullUrl = url.startsWith('http') 
-                                        ? url 
-                                        : `http://localhost:5000${url.startsWith('/') ? url : '/' + url}`;
-                                      window.location.href = fullUrl;
-                                    } else {
-                                      alert('Document URL not available');
-                                    }
-                                  }}
-                                  className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
-                                  title="Download Document"
-                                >
-                                  <Download className="w-4 h-4" />
-                                  Download
-                                </button>
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                         
                         <div className="mt-3 p-3 bg-blue-100 rounded-lg">
@@ -428,6 +441,7 @@ export default function FacultyDashboard() {
                       </div>
                     </div>
                   ) : null}
+
 
                   {/* Skills Section */}
                   {(selectedActivity.selectedTechnicalSkills?.length > 0 || 
@@ -451,6 +465,7 @@ export default function FacultyDashboard() {
                           </div>
                         )}
 
+
                         {selectedActivity.selectedSoftSkills?.length > 0 && (
                           <div>
                             <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Soft Skills</p>
@@ -466,6 +481,7 @@ export default function FacultyDashboard() {
                             </div>
                           </div>
                         )}
+
 
                         {selectedActivity.selectedTools?.length > 0 && (
                           <div>
@@ -486,6 +502,7 @@ export default function FacultyDashboard() {
                     </div>
                   )}
 
+
                   {/* Certificate Section */}
                   {selectedActivity.status === 'approved' ? (
                     <div className="bg-white border-2 border-green-200 rounded-xl p-6 hover:border-green-400 transition duration-300 bg-green-50">
@@ -494,6 +511,7 @@ export default function FacultyDashboard() {
                           <p className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-2"> Status</p>
                           <p className="text-sm text-green-700 font-medium">Approved & Ready</p>
                         </div>
+
 
                         {selectedActivity.certificateId ? (
                           <>
@@ -550,6 +568,7 @@ export default function FacultyDashboard() {
                         />
                       </div>
 
+
                       <div className="space-y-3">
                         <button
                           onClick={() => handleApprove(selectedActivity._id)}
@@ -568,6 +587,7 @@ export default function FacultyDashboard() {
                             </>
                           )}
                         </button>
+
 
                         <button
                           onClick={() => {

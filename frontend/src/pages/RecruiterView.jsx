@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../api/apiClient';
 import { Share2, Download, ExternalLink, Award, User, Mail, BookOpen, Code, Loader, ArrowLeft, FileText, CheckCircle, QrCode } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -18,9 +18,7 @@ export default function RecruiterView() {
 
   const fetchStudentProfile = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/recruiter/student/${studentId}`
-      );
+      const response = await apiClient.get(`/recruiter/student/${studentId}`);
       setProfile(response.data);
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -59,9 +57,7 @@ export default function RecruiterView() {
   const downloadCertificate = async (certificateId, studentName) => {
     setDownloadingCert(certificateId);
     try {
-      // The certificate is already generated and stored at the backend
-      const response = await axios.get(
-        `http://localhost:5000/api/certificates/download/${certificateId}`,
+      const response = await apiClient.get(`/certificates/download/${certificateId}`,
         { responseType: 'blob' }
       );
       

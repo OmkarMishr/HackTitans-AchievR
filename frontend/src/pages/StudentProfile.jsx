@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api/apiClient';
 import { Award, Code, Heart, Wrench, CheckCircle, Loader, Sparkles, TrendingUp } from 'lucide-react';
 
 export default function StudentProfile({ user }) {
@@ -14,7 +14,7 @@ export default function StudentProfile({ user }) {
   const fetchProfile = async () => {
     try {
       // Get all certified activities
-      const res = await axios.get('http://localhost:5000/api/activities/my-activities', {
+      const res = await apiClient.get('/activities/my-activities', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 

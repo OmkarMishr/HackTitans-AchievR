@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../api/apiClient';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Plus, Download, TrendingUp, Award, Clock, AlertCircle, Zap, GraduationCap, Share2, X, Copy, ExternalLink, Code, User, Mail, BookOpen, QrCode, CheckCircle, FileText, Loader, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -28,7 +28,7 @@ export default function StudentDashboard({ user }) {
 
   const fetchActivities = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/activities/my-activities', {
+      const response = await apiClient.get('/activities/my-activities', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 
@@ -58,8 +58,7 @@ export default function StudentDashboard({ user }) {
   const handleSharePortfolio = async () => {
     setPreviewLoading(true);
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/recruiter/my-profile`,
+      const response = await apiClient.get(`/recruiter/my-profile`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         }
