@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, CheckCircle2, Zap, BarChart3, Lock, Infinity, User, LogOut } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Zap, BarChart3, Lock, Infinity, User, LogOut, Folder, Target } from 'lucide-react';
 import achievrLogo from '../assets/achievr-logo.png';
 import convocationHat from '../assets/convocation-hat (1).png';
 
@@ -120,10 +120,10 @@ export default function PremiumAchievRLanding({ user, setUser }) {
             {/* Left - Text Content - 2/3 Width */}
             <div className="col-span-2 pr-0 mt-10">
               <h2 className="text-7xl font-normal leading-[1.1] mb-0 animate-fadeInUp text-left" style={{ animationDelay: '0.1s' }}>
-                <span className="block">Transform Student </span>
-                <span className="block">Achievement into</span>
+                <span className="block">Verified Achievements </span>
+                <span className="block">That Recruiters</span>
 
-                <span className="block font-normal bg-gradient-to-r from-orange-700 via-orange-600 to-orange-500 bg-clip-text text-transparent">Verified Professional Value</span>
+                <span className="block font-normal bg-gradient-to-r from-orange-700 via-orange-600 to-orange-500 bg-clip-text text-transparent">Can Trust Instantly</span>
               </h2>
             </div>
 
@@ -144,12 +144,12 @@ export default function PremiumAchievRLanding({ user, setUser }) {
               onClick={() => navigate(user ? (user.role === 'student' ? '/dashboard' : `/${user.role}`) : '/register')}
               className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:from-orange-700 hover:to-orange-600 transition duration-300 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105"
             >
-              <span className="font-medium text-sm">{user ? 'Go to Dashboard' : 'Try Now'}</span>
+              <span className="font-medium text-sm">{user ? 'Go to Dashboard' : 'Get Certified Instantly'}</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition" />
             </button>
             <p className="text-lg text-gray-600 font-normal leading-relaxed">
-              India's first AI-powered student portfolio platform. Detect fake certificates in 2 seconds. Build verified skill profiles.
-              <span className="block">Get discovered by top recruiters. Blockchain-certified. Built for institutions that demand authenticity.</span>
+              AchievR eliminates slow offline certificate distribution by issuing instant digital certificates and automatically
+              <span className="block">building a verified student portfolio — empowering students with trusted, recruiter-ready professional credibility.</span>
             </p>
           </div>
 
@@ -174,39 +174,44 @@ export default function PremiumAchievRLanding({ user, setUser }) {
               {
                 num: "01",
                 title: "Submit Achievement",
-                desc: "Upload certificate, select skills, add context",
+                desc: "Upload your event participation or achievement details",
               },
               {
                 num: "02",
                 title: "Faculty Approval",
-                desc: "One-click approval with comments workflow",
+                desc: "Authorized faculty verifies and approves authenticity",
               },
               {
                 num: "03",
-                title: "Get Certified",
-                desc: "QR code, shareable proof, searchable profile",
+                title: "Instant Digital Certificate",
+                desc: "Receive your certificate immediately after approval.",
               },
               {
                 num: "04",
                 title: "Share Portfolio",
-                desc: "Showcase your verified skills and achievements",
+                desc: "Your verified achievements are added to your professional portfolio — shareable with recruiters.",
               },
             ].map((step, idx, arr) => (
               <div key={step.num} className="relative group">
 
                 {/* Step Card */}
-                <div className="p-8 rounded-xl border-2 border-gray-200 bg-gradient-to-br from-orange-50 to-white transition duration-300 hover:border-orange-400 hover:shadow-lg hover:scale-105">
+                <div className="h-full flex flex-col p-8 rounded-xl border-2 border-gray-200 bg-gradient-to-br from-orange-50 to-white transition duration-300 hover:border-orange-400 hover:shadow-lg hover:scale-105">
 
-                  <div className="text-5xl font-bold text-orange-200 mb-4 group-hover:text-orange-400 transition"> {step.num} </div>
+                  <div className="text-5xl font-bold text-orange-200 mb-4 group-hover:text-orange-400 transition">
+                    {step.num}
+                  </div>
 
                   <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-orange-600 transition">
                     {step.title}
                   </h3>
 
-                  <p className="text-gray-600 font-light leading-relaxed">
+                  {/* Make description take remaining space */}
+                  <p className="text-gray-600 font-light leading-relaxed flex-grow">
                     {step.desc}
                   </p>
+
                 </div>
+
 
                 {/* Arrow Between Steps */}
                 {idx !== arr.length - 1 && (
@@ -229,15 +234,15 @@ export default function PremiumAchievRLanding({ user, setUser }) {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="animate-slideInLeft">
-              <h2 className="text-5xl font-light mb-8 leading-tight text-gray-900">The Problem with
-                <span className="block bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent font-normal"> Traditional Verification</span>
+              <h2 className="text-5xl font-light mb-8 leading-tight text-gray-900">The Problem
+                <span className="block bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent font-normal">Students Face Today</span>
               </h2>
               <div className="space-y-6">
                 <p className="text-gray-700 font-light leading-relaxed hover:text-gray-900 transition">
-                  Educational institutions lose billions annually to credential fraud. Students spend weeks on manual verification. Employers have zero trust.
+                  Students often receive certificates weeks or months after events. Many lose them. Recruiters cannot verify authenticity, and achievements remain scattered and unrecognized.
                 </p>
                 <p className="text-gray-700 font-light leading-relaxed hover:text-gray-900 transition">
-                  AchievR eliminates this friction with cryptographic certainty. Every achievement is AI-scanned, faculty-verified, and blockchain-certified within minutes.
+                  AchievR digitizes certification and converts verified achievements into a structured, trusted portfolio — making student skills visible and credible.
                 </p>
               </div>
             </div>
@@ -245,29 +250,29 @@ export default function PremiumAchievRLanding({ user, setUser }) {
               <div className="space-y-8">
                 <div className="flex gap-4 group">
                   <div className="flex-shrink-0 pt-1">
-                    <CheckCircle2 size={20} className="text-orange-600 group-hover:text-orange-700 transition" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900 mb-1 group-hover:text-orange-700 transition">Activity Record</p>
-                    <p className="text-sm text-gray-600 font-light">All activities are recorded and timestamped</p>
-                  </div>
-                </div>
-                <div className="flex gap-4 group">
-                  <div className="flex-shrink-0 pt-1">
-                    <Lock size={20} className="text-orange-600 group-hover:text-orange-700 transition" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900 mb-1 group-hover:text-orange-700 transition">Get Certified</p>
-                    <p className="text-sm text-gray-600 font-light">Verified certificates with QR-Codes</p>
-                  </div>
-                </div>
-                <div className="flex gap-4 group">
-                  <div className="flex-shrink-0 pt-1">
                     <Zap size={20} className="text-orange-600 group-hover:text-orange-700 transition" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900 mb-1 group-hover:text-orange-700 transition">Instant Deployment</p>
-                    <p className="text-sm text-gray-600 font-light">From submission to certification in minutes</p>
+                    <p className="font-medium text-gray-900 mb-1 group-hover:text-orange-700 transition">Instant Certificate Issuance</p>
+                    <p className="text-sm text-gray-600 font-light">Certificates delivered digitally right after approval</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 group">
+                  <div className="flex-shrink-0 pt-1">
+                    <Folder size={20} className="text-orange-600 group-hover:text-orange-700 transition" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 mb-1 group-hover:text-orange-700 transition">Auto Portfolio Builder</p>
+                    <p className="text-sm text-gray-600 font-light">All verified achievements automatically build your professional profile</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 group">
+                  <div className="flex-shrink-0 pt-1">
+                    <Target size={20} className="text-orange-600 group-hover:text-orange-700 transition" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 mb-1 group-hover:text-orange-700 transition">Recruiter-Ready</p>
+                    <p className="text-sm text-gray-600 font-light">Share one verified portfolio link - no manual proof needed</p>
                   </div>
                 </div>
               </div>
@@ -290,16 +295,16 @@ export default function PremiumAchievRLanding({ user, setUser }) {
             <div className="bg-white p-8 border-2 border-gray-300 rounded-xl hover:border-orange-400 shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105 group relative" style={{ animation: `fadeInUp 0.6s ease-out 0.2s both` }}>
               <div className="absolute top-0 left-0 w-1 h-16 bg-gradient-to-b from-orange-600 to-orange-500 rounded-l-xl" />
               <p className="text-gray-700 font-light mb-6 italic leading-relaxed pl-4 group-hover:text-gray-900 transition">
-                "AchievR eliminated credential fraud in our placement process. Our hiring time dropped by 60%."
+                "Certificate distribution that once took weeks is now completed within minutes. AchievR made our process fully digital and seamless."
               </p>
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-medium text-gray-900 group-hover:bg-gradient-to-r group-hover:from-orange-700 group-hover:to-orange-600 group-hover:bg-clip-text group-hover:text-transparent transition">Dr. Priya Sharma</p>
-                  <p className="text-xs text-gray-600 font-light mt-1">Director, Admissions - IIT Bombay</p>
+                  {/* <p className="font-medium text-gray-900 group-hover:bg-gradient-to-r group-hover:from-orange-700 group-hover:to-orange-600 group-hover:bg-clip-text group-hover:text-transparent transition">~ Academic Administrator</p> */}
+                  {/* <p className="text-xs text-gray-600 font-light mt-1">Director, Admissions - IIT Bombay</p> */}
                 </div>
                 <div className="text-right">
                   <p className="text-xs font-semibold bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent uppercase tracking-wider">
-                    60% faster hiring
+                  ~  Academic Administrator
                   </p>
                 </div>
               </div>
@@ -308,16 +313,16 @@ export default function PremiumAchievRLanding({ user, setUser }) {
             <div className="bg-white p-8 border-2 border-gray-300 rounded-xl hover:border-orange-400 shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105 group relative" style={{ animation: `fadeInUp 0.6s ease-out 0.3s both` }}>
               <div className="absolute top-0 left-0 w-1 h-16 bg-gradient-to-b from-orange-500 to-orange-400 rounded-l-xl" />
               <p className="text-gray-700 font-light mb-6 italic leading-relaxed pl-4 group-hover:text-gray-900 transition">
-                "Students love the instant verification. We've eliminated manual documentation completely."
+                "Students no longer wait for certificates after events. Their achievements are instantly verified and added to a professional portfolio."
               </p>
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-medium text-gray-900 group-hover:bg-gradient-to-r group-hover:from-orange-700 group-hover:to-orange-600 group-hover:bg-clip-text group-hover:text-transparent transition">Rajesh Patel</p>
-                  <p className="text-xs text-gray-600 font-light mt-1">Dean of Students - BITS Pilani</p>
+                  {/* <p className="font-medium text-gray-900 group-hover:bg-gradient-to-r group-hover:from-orange-700 group-hover:to-orange-600 group-hover:bg-clip-text group-hover:text-transparent transition">Rajesh Patel</p>
+                  <p className="text-xs text-gray-600 font-light mt-1">Dean of Students - BITS Pilani</p> */}
                 </div>
                 <div className="text-right">
                   <p className="text-xs font-semibold bg-gradient-to-r from-orange-500 to-orange-400 bg-clip-text text-transparent uppercase tracking-wider">
-                    100% automated
+                    ~ Event Coordinator
                   </p>
                 </div>
               </div>
@@ -334,15 +339,15 @@ export default function PremiumAchievRLanding({ user, setUser }) {
         </div>
 
         <div className="max-w-4xl mx-auto relative z-10 text-center">
-          <h2 className="text-5xl font-light mb-6 text-white animate-fadeInUp">Ready to Transform Student Activity Records</h2>
+          <h2 className="text-5xl font-light mb-6 text-white animate-fadeInUp">Ready to Go Digital with Event Certification</h2>
           <p className="text-lg text-gray-300 font-light mb-8 max-w-2xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
-            Join institutions securing their future with military-grade credential verification.
+            Join us for instant event certification and recruiter-ready portfolios.
           </p>
           <button
             onClick={() => navigate(user ? (user.role === 'student' ? '/dashboard' : `/${user.role}`) : '/register')}
             className="inline-flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:from-orange-700 hover:to-orange-600 transition duration-300 font-medium shadow-xl shadow-orange-500/50 hover:shadow-orange-500/70 hover:scale-105 animate-fadeInUp"
             style={{ animationDelay: '0.2s' }}>
-            {user ? 'Go to Dashboard' : 'Request Demo'}
+            {user ? 'Go to Dashboard' : 'Start Digital Certification'}
             <ArrowRight size={16} />
           </button>
         </div>
@@ -354,10 +359,10 @@ export default function PremiumAchievRLanding({ user, setUser }) {
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <img src={achievrLogo} alt="AchievR Logo" className="h-8 w-auto" />
-                <p className="font-light text-gray-900">ACHIEVR</p>
+                <img src={achievrLogo} alt="AchievR Logo" className="h-18 w-auto" />
+                {/* <p className="font-light text-gray-900">ACHIEVR</p> */}
               </div>
-              <p className="text-xs text-gray-600 font-light">Credential Verification System</p>
+              <p className="text-xs text-gray-600 font-light">Your Verified Path to Opportunities</p>
               <div className="flex gap-2 mt-4">
                 <div className="w-2 h-2 rounded-full bg-gradient-to-r from-orange-600 to-orange-500" />
                 <div className="w-2 h-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-400" />
@@ -390,7 +395,7 @@ export default function PremiumAchievRLanding({ user, setUser }) {
           </div>
 
           <div className="border-t border-gray-200 pt-8 text-center">
-            <p className="text-xs text-gray-600 font-light">
+            <p className="text-xs text-gray-900 font-light">
               © 2025 AchievR. All right reserved Developed by Hack Titans (Shashank & Omkar)
             </p>
           </div>
