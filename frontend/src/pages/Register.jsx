@@ -59,8 +59,7 @@ export default function Register() {
   </h1>
 
   <p className="text-slate-300 text-lg mb-10 max-w-md">
-    Turn your achievements into verified professional proof.
-    Build a trusted portfolio recognized by institutions and recruiters.
+    Turn your event participation into verified digital proof. Get instant certificates and build a recruiter-ready portfolio.
   </p>
 
   <div className="space-y-6">
@@ -69,21 +68,21 @@ export default function Register() {
       <div className="bg-orange-500/15 p-2 rounded-lg">
         <Trophy className="text-orange-400" />
       </div>
-      <span className="text-slate-200">Showcase verified achievements</span>
+      <span className="text-slate-200">Showcase verified achievements &  participation</span>
     </div>
 
     <div className="flex items-center gap-3">
       <div className="bg-orange-500/15 p-2 rounded-lg">
         <ShieldCheck className="text-orange-400" />
       </div>
-      <span className="text-slate-200">Blockchain-secured certification</span>
+      <span className="text-slate-200">Get instant digital certificates</span>
     </div>
 
     <div className="flex items-center gap-3">
       <div className="bg-orange-500/15 p-2 rounded-lg">
         <Sparkles className="text-orange-400" />
       </div>
-      <span className="text-slate-200">Build your professional identity</span>
+      <span className="text-slate-200">Build your recruiter-ready professional portfolio</span>
     </div>
 
   </div>
