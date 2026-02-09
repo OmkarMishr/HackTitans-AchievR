@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
 import { Mail, Lock, AlertCircle, Eye, EyeOff, LogIn } from "lucide-react";
+import { loginUser } from "../services/authService";
 
 export default function Login({ setUser }) {
   const [email, setEmail] = useState("");
@@ -18,17 +18,14 @@ export default function Login({ setUser }) {
     setError("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        { email, password }
-      );
+      const { data } = await loginUser({ email, password });
 
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-      setUser(response.data.user);
+      setUser(data.user);
 
-      const role = response.data.user.role;
+      const role = data.user.role;
       navigate(role === "student" ? "/dashboard" : `/${role}`);
     } catch (err) {
       setError(err.response?.data?.error || "Login failed. Try again.");
@@ -42,7 +39,9 @@ export default function Login({ setUser }) {
       <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-xl p-10">
         <div className="text-center mb-8">
           <h2 className="text-4xl font-bold text-gray-900">Sign In</h2>
-          <p className="text-gray-600 mt-2 text-lg"> Access your verified portfolio </p>
+          <p className="text-gray-600 mt-2 text-lg">
+            Access your verified portfolio
+          </p>
         </div>
 
         {error && (
@@ -58,7 +57,14 @@ export default function Login({ setUser }) {
               <Mail size={18} className="text-orange-600" />
               Email
             </label>
-            <input type="email" placeholder="john@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none" required />
+            <input
+              type="email"
+              placeholder="john@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none"
+              required
+            />
           </div>
 
           <div>
@@ -74,7 +80,8 @@ export default function Login({ setUser }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none"
-                required />
+                required
+              />
 
               <button
                 type="button"
@@ -86,8 +93,14 @@ export default function Login({ setUser }) {
             </div>
           </div>
 
-          <button type="submit" disabled={loading} className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 transition">
-            {loading ? "Signing In..." : (
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 transition"
+          >
+            {loading ? (
+              "Signing In..."
+            ) : (
               <>
                 <LogIn size={18} />
                 Sign In
@@ -96,16 +109,12 @@ export default function Login({ setUser }) {
           </button>
         </form>
 
-        {/* <div className="mt-6 text-center">
-          <Link to="/forgot-password" className="text-orange-600 hover:underline text-sm font-medium"
-          >
-            Forgot password?
-          </Link>
-        </div> */}
-
         <div className="mt-8 pt-6 border-t text-center">
           <p className="text-gray-600 mb-2">Don’t have an account?</p>
-          <Link to="/register" className="text-orange-600 font-semibold hover:underline" >
+          <Link
+            to="/register"
+            className="text-orange-600 font-semibold hover:underline"
+          >
             Create Account →
           </Link>
         </div>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import axios from 'axios';
 import SkillSelector from '../components/SkillSelector';
 import { Upload, CheckCircle2, AlertCircle, Loader, GraduationCap, FileText } from 'lucide-react';
+import apiClient from '../api/apiClient';
 
 export default function SubmitActivity() {
   const [formData, setFormData] = useState({
@@ -79,9 +79,7 @@ export default function SubmitActivity() {
     }
 
     try {
-      const response = await axios.post(
-        'http://localhost:5000/api/activities/submit',
-        formDataObj,
+      const response = await apiClient.post('/activities/submit',formDataObj,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,

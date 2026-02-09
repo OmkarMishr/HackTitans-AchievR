@@ -1,8 +1,7 @@
 // src/pages/VerifyCertificate.jsx
 import { useState } from 'react';
 import { CheckCircle, AlertCircle, Loader, Copy } from 'lucide-react';
-import axios from 'axios';
-
+import apiClient from '../api/apiClient';
 export default function VerifyCertificate() {
   const [certificateId, setCertificateId] = useState('');
   const [verified, setVerified] = useState(null);
@@ -28,9 +27,7 @@ export default function VerifyCertificate() {
       console.log('Verifying certificate:', certificateId);
 
       // CORRECT BACKEND URL
-      const response = await axios.get(
-        `http://localhost:5000/api/certificates/verify/${certificateId}`
-      );
+      const response = await apiClient.get(`/certificates/verify/${certificateId}`);
 
       console.log('Response:', response.data);
 
@@ -70,7 +67,7 @@ export default function VerifyCertificate() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-light text-gray-900 mb-4">
-            🔐 Verify Certificate
+            Verify Certificate
           </h1>
           <p className="text-gray-600 font-light text-lg">
             Enter your certificate ID to verify its authenticity

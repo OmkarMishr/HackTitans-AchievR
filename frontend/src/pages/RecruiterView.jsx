@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../api/apiClient';
 import { Share2, Download, ExternalLink, Award, User, Mail, BookOpen, Code, Loader, ArrowLeft, FileText, CheckCircle, QrCode } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -18,9 +18,7 @@ export default function RecruiterView() {
 
   const fetchStudentProfile = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/recruiter/student/${studentId}`
-      );
+      const response = await apiClient.get(`/recruiter/student/${studentId}`);
       setProfile(response.data);
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -53,32 +51,6 @@ export default function RecruiterView() {
       }
     } else {
       handleCopyLink();
-    }
-  };
-
-  const downloadCertificate = async (certificateId, studentName) => {
-    setDownloadingCert(certificateId);
-    try {
-      // The certificate is already generated and stored at the backend
-      const response = await axios.get(
-        `http://localhost:5000/api/certificates/download/${certificateId}`,
-        { responseType: 'blob' }
-      );
-      
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `${studentName}_${certificateId}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.parentChild.removeChild(link);
-      
-      toast.success('Certificate downloaded successfully!');
-    } catch (error) {
-      console.error('Download error:', error);
-      toast.error('Failed to download certificate');
-    } finally {
-      setDownloadingCert(null);
     }
   };
 
@@ -370,40 +342,6 @@ export default function RecruiterView() {
                       </div>
                     )}
 
-                    {/* Certificate Download Section */}
-                    {activity.qrCodeUrl && (
-                      <div className="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <QrCode className="w-5 h-5 text-blue-600" />
-                            <p className="text-sm font-semibold text-gray-900">Blockchain-Verified Certificate</p>
-                          </div>
-                          <p className="text-xs text-gray-600 font-light leading-relaxed">
-                            This achievement has been verified and certified using blockchain technology. The certificate includes a QR code for instant verification by employers and institutions.
-                          </p>
-                          <p className="text-xs text-gray-500 font-light mt-2">
-                            Certificate ID: <span className="font-mono text-blue-600">{activity.id.slice(0, 12)}...</span>
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => downloadCertificate(activity.id, profile.student.name)}
-                          disabled={downloadingCert === activity.id}
-                          className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-600 transition duration-300 shadow-lg shadow-blue-500/20 disabled:from-gray-400 disabled:to-gray-400 disabled:shadow-none"
-                        >
-                          {downloadingCert === activity.id ? (
-                            <>
-                              <Loader className="w-4 h-4 animate-spin" />
-                              Downloading...
-                            </>
-                          ) : (
-                            <>
-                              <Download className="w-4 h-4" />
-                              Download Certificate
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
@@ -423,12 +361,12 @@ export default function RecruiterView() {
               <QrCode className="w-6 h-6 text-orange-600" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-900 mb-2">Blockchain-Verified Credentials</p>
+              <p className="text-sm font-semibold text-gray-900 mb-2">AchievR</p>
               <p className="text-xs text-gray-600 font-light leading-relaxed">
-                All achievements displayed here have been validated by AchievR's AI fraud detection system and verified by institution faculty. Each certificate is secured with blockchain technology and includes cryptographic verification. Employers can scan the QR code on any certificate for instant, tamper-proof verification.
+                All achievements displayed here have been verified by institution faculty and certified by Admin.
               </p>
               <p className="text-xs text-gray-500 font-light mt-3">
-                Generated by AchievR - Advanced Credential Verification System
+                Generated by AchievR (built by Shashank & Omkar)
               </p>
             </div>
           </div>

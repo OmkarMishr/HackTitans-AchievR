@@ -46,9 +46,10 @@ export default function App() {
         <Route path="/login" element={user ? <Navigate to={user.role === 'student' ? '/dashboard' : `/${user.role}`} /> : <Login setUser={setUser} />} />
         <Route path="/register" element={user ? <Navigate to={user.role === 'student' ? '/dashboard' : `/${user.role}`} /> : <Register />} />
         <Route path="/verify/:hash" element={<PublicVerify />} />
-        <Route path="/recruiter-view/:studentId" element={<RecruiterView />} /> {/* Add this */}
+        <Route path="/recruiter-view/:studentId" element={<RecruiterView />} />
         <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
         <Route path="/verify-certificate" element={<VerifyCertificate />} />
+
         {/* Protected Routes - Student */}
         {user?.role === 'student' && (
           <>
@@ -57,17 +58,17 @@ export default function App() {
             <Route path="/profile" element={<><Navbar user={user} setUser={setUser} /><StudentProfile user={user} /></>} />
           </>
         )}
-        
+
         {/* Protected Routes - Faculty */}
         {user?.role === 'faculty' && (
           <Route path="/faculty" element={<><Navbar user={user} setUser={setUser} /><FacultyDashboard user={user} /></>} />
         )}
-        
+
         {/* Protected Routes - Admin */}
         {user?.role === 'admin' && (
           <Route path="/admin" element={<><Navbar user={user} setUser={setUser} /><AdminDashboard user={user} /></>} />
         )}
-        
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

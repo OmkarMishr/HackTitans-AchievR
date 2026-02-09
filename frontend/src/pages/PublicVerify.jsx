@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../api/apiClient';
 import { CheckCircle, XCircle, Loader, Shield, Award, Calendar, User, Sparkles, ArrowLeft } from 'lucide-react';
 
 export default function PublicVerify() {
@@ -12,7 +12,7 @@ export default function PublicVerify() {
   useEffect(() => {
     const verify = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/verify/${hash}`);
+        const response = await apiClient.get(`/verify/${hash}`);
         setVerificationData(response.data);
       } catch (error) {
         console.error('Verification error:', error);

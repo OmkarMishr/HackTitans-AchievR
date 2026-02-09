@@ -1,7 +1,16 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
-import { GraduationCap, Mail, Lock, User, BookOpen, Code, AlertCircle } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  User,
+  Mail,
+  Lock,
+  AlertCircle,
+  UserPlus,
+  Trophy,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
+import { registerUser } from "../services/authService";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -11,190 +20,191 @@ export default function Register() {
     role: "student",
     rollNumber: "",
     department: "",
-    year: "4",
   });
 
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+    setLoading(true);
 
     try {
-      await axios.post("http://localhost:5000/api/auth/register", formData);
+      await registerUser(formData);
       navigate("/login");
     } catch (err) {
-      setError(err.response?.data?.error || "Registration failed.");
+      setError(err.response?.data?.error || "Registration failed. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="h-screen flex bg-white overflow-hidden">
-      
-      <div className="hidden md:flex w-1/2 bg-orange-50 items-center justify-center px-12">
-        <div>
-          <h1 className="text-5xl font-bold text-gray-900">
-            Join <span className="text-orange-600">AchievR</span>
-          </h1>
-          <p className="text-gray-600 mt-4 text-lg max-w-md">
-            Build your verified portfolio in minutes.
-          </p>
-        </div>
-      </div>
+    <div className="h-screen grid grid-cols-1 md:grid-cols-2 bg-white">
 
-      <div className="w-full md:w-1/2 flex items-center justify-center px-6">
-        <div className="w-full max-w-xl bg-white border border-gray-200 rounded-2xl shadow-xl p-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900">
+      {/* LEFT SIDE — COOL PREMIUM BRAND */}
+<div className="hidden md:flex flex-col justify-center px-16 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+
+  <h1 className="text-5xl font-bold mb-6">
+    Join <span className="text-orange-500">AchievR</span>
+  </h1>
+
+  <p className="text-slate-300 text-lg mb-10 max-w-md">
+    Turn your achievements into verified professional proof.
+    Build a trusted portfolio recognized by institutions and recruiters.
+  </p>
+
+  <div className="space-y-6">
+
+    <div className="flex items-center gap-3">
+      <div className="bg-orange-500/15 p-2 rounded-lg">
+        <Trophy className="text-orange-400" />
+      </div>
+      <span className="text-slate-200">Showcase verified achievements</span>
+    </div>
+
+    <div className="flex items-center gap-3">
+      <div className="bg-orange-500/15 p-2 rounded-lg">
+        <ShieldCheck className="text-orange-400" />
+      </div>
+      <span className="text-slate-200">Blockchain-secured certification</span>
+    </div>
+
+    <div className="flex items-center gap-3">
+      <div className="bg-orange-500/15 p-2 rounded-lg">
+        <Sparkles className="text-orange-400" />
+      </div>
+      <span className="text-slate-200">Build your professional identity</span>
+    </div>
+
+  </div>
+</div>
+
+
+      {/* RIGHT SIDE — FORM */}
+      <div className="flex items-center justify-center px-6">
+        <div className="w-full max-w-md">
+
+          <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
             Create Account
           </h2>
-          <p className="text-gray-600 text-center text-sm mt-1">
-            Start verifying achievements today
-          </p>
 
+          {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-4 flex gap-2">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 flex gap-2">
               <AlertCircle className="text-red-600" size={18} />
               <p className="text-red-700 text-sm">{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4 mt-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-semibold flex gap-1 items-center">
-                  <User size={15} className="text-orange-600" />
-                  Name
-                </label>
+          <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* Name */}
+            <div className="relative">
+              <User className="absolute left-3 top-3 text-gray-400" size={18} />
+              <input
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
+                required
+              />
+            </div>
+
+            {/* Email */}
+            <div className="relative">
+              <Mail className="absolute left-3 top-3 text-gray-400" size={18} />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
+                required
+              />
+            </div>
+
+            {/* Password */}
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 text-gray-400" size={18} />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
+                required
+              />
+            </div>
+
+            {/* Role */}
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white"
+            >
+              <option value="student">Student</option>
+              <option value="faculty">Faculty</option>
+              <option value="admin">Admin</option>
+            </select>
+
+            {/* Student Fields */}
+            {formData.role === "student" && (
+              <div className="grid grid-cols-2 gap-3">
                 <input
                   type="text"
-                  name="name"
-                  placeholder="John Doe"
-                  value={formData.name}
+                  name="rollNumber"
+                  placeholder="Roll Number"
+                  value={formData.rollNumber}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
-                  required
+                  className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
                 />
-              </div>
-
-              <div>
-                <label className="text-sm font-semibold flex gap-1 items-center"> <Mail size={15} className="text-orange-600" /> Email </label>
                 <input
-                  type="email"
-                  name="email"
-                  placeholder="john@example.com"
-                  value={formData.email}
+                  type="text"
+                  name="department"
+                  placeholder="Department"
+                  value={formData.department}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
-                  required
+                  className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
                 />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-semibold flex gap-1 items-center">
-                  <Lock size={15} className="text-orange-600" />
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-semibold flex gap-1 items-center">
-                  <Code size={15} className="text-orange-600" />
-                  Role
-                </label>
-                <select name="role" value={formData.role} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white" >
-                  <option value="student">Student</option>
-                  <option value="faculty">Faculty</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-            </div>
-
-            {formData.role === "student" && (
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="text-sm font-semibold flex gap-1 items-center">
-                    <BookOpen size={15} className="text-orange-600" />
-                    Roll No
-                  </label>
-                  <input
-                    type="text"
-                    name="rollNumber"
-                    value={formData.rollNumber}
-                    onChange={handleChange}
-                    placeholder="BIT2021001"
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-semibold">
-                    Year
-                  </label>
-                  <select
-                    name="year"
-                    value={formData.year}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white"
-                  >
-                    <option value="1">1st</option>
-                    <option value="2">2nd</option>
-                    <option value="3">3rd</option>
-                    <option value="4">4th</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-semibold flex gap-1 items-center">
-                    <Code size={15} className="text-orange-600" />
-                    Dept
-                  </label>
-                  <input
-                    type="text"
-                    name="department"
-                    value={formData.department}
-                    onChange={handleChange}
-                    placeholder="CSE"
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
-                    required
-                  />
-                </div>
               </div>
             )}
 
-            <button type="submit" disabled={loading} className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition" >
-              <GraduationCap size={18} />
-              {loading ? "Creating..." : "Create Account"}
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transition flex items-center justify-center gap-2"
+            >
+              {loading ? "Creating Account..." : (
+                <>
+                  <UserPlus size={18} />
+                  Register
+                </>
+              )}
             </button>
           </form>
 
-          {/* Footer */}
-          <div className="mt-5 text-center text-sm">
+          <p className="text-center text-sm text-gray-500 mt-5">
             Already have an account?{" "}
-            <Link to="/login" className="text-orange-600 font-semibold hover:underline" >
-              Login →
+            <Link to="/login" className="text-orange-600 font-semibold hover:underline">
+              Sign In
             </Link>
-          </div>
+          </p>
         </div>
       </div>
     </div>
