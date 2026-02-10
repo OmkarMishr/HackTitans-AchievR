@@ -63,8 +63,7 @@ export default function Login({ setUser }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none"
-              required
-            />
+              required/>
           </div>
 
           <div>
@@ -111,10 +110,7 @@ export default function Login({ setUser }) {
 
         <div className="mt-8 pt-6 border-t text-center">
           <p className="text-gray-600 mb-2">Don’t have an account?</p>
-          <Link
-            to="/register"
-            className="text-orange-600 font-semibold hover:underline"
-          >
+          <Link to="/register" className="text-orange-600 font-semibold hover:underline">
             Create Account →
           </Link>
         </div>

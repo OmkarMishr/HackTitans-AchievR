@@ -118,12 +118,13 @@ export default function PremiumAchievRLanding({ user, setUser }) {
           <div className="grid grid-cols-3 gap-0 items-start mb-8">
 
             {/* Left - Text Content - 2/3 Width */}
-            <div className="col-span-2 pr-0 mt-10">
+            <div className="col-span-2 pr-0 mt-15">
               <h2 className="text-7xl font-normal leading-[1.1] mb-0 animate-fadeInUp text-left" style={{ animationDelay: '0.1s' }}>
                 <span className="block">Verified Achievements </span>
                 <span className="block">That Recruiters</span>
 
                 <span className="block font-normal bg-gradient-to-r from-orange-700 via-orange-600 to-orange-500 bg-clip-text text-transparent">Can Trust Instantly</span>
+
               </h2>
             </div>
 
@@ -304,7 +305,7 @@ export default function PremiumAchievRLanding({ user, setUser }) {
                 </div>
                 <div className="text-right">
                   <p className="text-xs font-semibold bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent uppercase tracking-wider">
-                  ~  Academic Administrator
+                    ~  Academic Administrator
                   </p>
                 </div>
               </div>
