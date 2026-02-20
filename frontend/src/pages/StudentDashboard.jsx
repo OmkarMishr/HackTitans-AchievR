@@ -29,8 +29,6 @@ export default function StudentDashboard({ user }) {
     fetchActivities();
   }, []);
 
-  /* ================= FETCH ================= */
-
   const fetchActivities = async () => {
     try {
       const response = await apiClient.get("/activities/my-activities", {
@@ -63,8 +61,6 @@ export default function StudentDashboard({ user }) {
       setLoading(false);
     }
   };
-
-  /* ================= SHARE ================= */
 
   const handleSharePortfolio = async () => {
     setPreviewLoading(true);
@@ -118,7 +114,7 @@ export default function StudentDashboard({ user }) {
           url: link,
         });
         setPreviewOpen(false);
-      } catch {}
+      } catch { }
     } else {
       handleCopyLink();
     }
@@ -128,8 +124,6 @@ export default function StudentDashboard({ user }) {
     setSelectedCertificate(certificate);
     setCertificateDetailsOpen(true);
   };
-
-  /* ================= HELPERS ================= */
 
   const formatDate = (date) => {
     if (!date) return "—";
@@ -147,8 +141,7 @@ export default function StudentDashboard({ user }) {
       ? Math.round((stats.certified / stats.total) * 100)
       : 0;
 
-  /* ================= LOADING ================= */
-
+  /* LOADING  */
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -157,54 +150,53 @@ export default function StudentDashboard({ user }) {
     );
   }
 
-  /* ================= UI ================= */
-
   return (
-    <div className="min-h-screen bg-gray-50">
-
+    <div className="min-h-screen bg-gray-50 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 
         {/* HEADER */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8 sm:mb-10">
 
           {/* LEFT */}
-          <div className="text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
-            <p className="text-sm text-orange-600 font-medium">
+          <div>
+            <p className="text-sm text-orange-600 font-medium mb-1">
               Hey {user?.name || "User"}
             </p>
 
-            <h1 className="mt-1 text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900">
+            {/* Responsive Heading */}
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-gray-900 tracking-tight leading-tight">
               Your Achievement Dashboard
             </h1>
 
-            <p className="mt-2 text-gray-600 text-sm sm:text-base">
+            <p className="mt-2 text-gray-600 font-light">
               Track, verify and showcase your achievements in a professional way.
             </p>
           </div>
 
           {/* RIGHT ACTIONS */}
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-3">
 
             <button
               onClick={handleSharePortfolio}
               disabled={previewLoading}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-orange-300 bg-white text-sm text-orange-600 hover:bg-orange-50 transition disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50 hover:shadow-sm transition disabled:opacity-50"
             >
               {previewLoading ? (
-                <Loader size={14} className="animate-spin" />
+                <Loader size={15} className="animate-spin" />
               ) : (
-                <Share2 size={14} />
+                <Share2 size={15} />
               )}
               Share Portfolio
             </button>
 
             <button
               onClick={() => navigate("/submit")}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-md bg-orange-600 text-white text-sm hover:bg-orange-700 transition"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-orange-600 text-white text-sm hover:bg-orange-700 shadow-sm hover:shadow-md transition"
             >
-              <Plus size={14} />
-              Add Achievement
+              <Plus size={15} />
+              Add Activity
             </button>
+
           </div>
         </div>
 
@@ -213,7 +205,7 @@ export default function StudentDashboard({ user }) {
           stats={stats}
           certificationRate={certificationRate}
           activities={activities}
-          handleDownloadCertificate={() => {}}
+          handleDownloadCertificate={() => { }}
           navigate={navigate}
         />
       </div>

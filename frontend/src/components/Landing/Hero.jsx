@@ -42,17 +42,19 @@ export default function Hero({ user }) {
 
       <div className="max-w-7xl mx-auto">
 
-        <div className="grid md:grid-cols-3 gap-8 items-center">
+       <div className="grid md:grid-cols-3 gap-8 items-center md:items-center md:justify-items-center">
 
           {/* Left Text */}
-          <div className="md:col-span-2">
-            <h2 className="text-4xl sm:text-5xl md:text-7xl leading-tight">
+         <div className="md:col-span-2 text-center md:text-left md:pr-10">
+          <h2 className="text-4xl sm:text-5xl md:text-7xl leading-tight font-light tracking-tight max-w-3xl mx-auto md:mx-0">
               Verified Achievements
               <br />
               That Recruiters
               <br />
               <span className="bg-gradient-to-r from-orange-700 to-orange-500 bg-clip-text text-transparent">
-                Can Trust Instantly
+                Can Trust 
+                <br/>
+                Instantly
               </span>
             </h2>
           </div>

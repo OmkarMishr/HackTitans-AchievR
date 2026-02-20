@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, Plus, FileCheck, Shield, Home, Menu } from "lucide-react";
+import { LogOut, Plus, FileCheck, Shield, Home, Menu, X } from "lucide-react";
 import { useState } from "react";
 import achievrLogo from "../assets/achievr-logo.png";
 
@@ -21,32 +21,28 @@ export default function Navbar({ user, setUser }) {
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Top Section */}
-        <div className="flex items-center justify-between py-3">
+        {/* Top Bar */}
+        <div className="flex items-center justify-between py-2 sm:py-3">
 
           {/* Logo */}
           <div
             onClick={() => navigate("/")}
-            className="flex items-center cursor-pointer"
-          >
-            <img
-              src={achievrLogo}
-              alt="AchievR"
-              className="h-10 sm:h-12 w-auto"
-            />
+            className="flex items-center cursor-pointer">
+            <img src={achievrLogo} alt="AchievR"
+              className="h-7 sm:h-10 md:h-11 w-auto object-contain" />
           </div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3 lg:gap-4">
 
             {/* User Info */}
-            <div className="text-right pr-4 border-r border-gray-200">
-              <p className="text-sm font-medium text-gray-900">
+            <div className="text-right pr-3 lg:pr-4 border-r border-gray-200 max-w-[140px] lg:max-w-none truncate">
+              <p className="text-sm font-medium text-gray-900 truncate">
                 {user?.name}
               </p>
-              <p className="text-xs text-gray-500 capitalize">
+              <p className="text-xs text-gray-500 capitalize truncate">
                 {user?.role}
               </p>
             </div>
@@ -54,68 +50,69 @@ export default function Navbar({ user, setUser }) {
             {/* Home */}
             <button
               onClick={() => navigate("/")}
-              className="flex items-center gap-2 px-4 py-2 text-sm rounded-md border border-gray-300 hover:bg-gray-50 transition"
-            >
+              className="flex items-center gap-2 px-3 lg:px-4 py-2 text-sm rounded-md border border-gray-300 hover:bg-gray-50 transition whitespace-nowrap"  >
               <Home size={16} />
-              Home
+              <span className="hidden lg:inline">Home</span>
             </button>
 
-            {/* Role-Based Button */}
+            {/* Role Buttons */}
             {user?.role === "student" && (
               <button
                 onClick={() => navigate("/submit")}
-                className="flex items-center gap-2 px-4 py-2 text-sm rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
-              >
+                className="flex items-center gap-2 px-3 lg:px-4 py-2 text-sm rounded-md bg-orange-600 text-white hover:bg-orange-700 transition whitespace-nowrap"  >
                 <Plus size={16} />
-                Submit Activity
+                <span className="hidden lg:inline">Submit Activity</span>
+                <span className="lg:hidden">Submit</span>
               </button>
             )}
 
             {user?.role === "faculty" && (
               <button
                 onClick={() => navigate("/faculty")}
-                className="flex items-center gap-2 px-4 py-2 text-sm rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
-              >
+                className="flex items-center gap-2 px-3 lg:px-4 py-2 text-sm rounded-md bg-orange-600 text-white hover:bg-orange-700 transition whitespace-nowrap" >
                 <FileCheck size={16} />
-                Review
+                <span className="hidden lg:inline">Review</span>
+                <span className="lg:hidden">Review</span>
               </button>
             )}
 
             {user?.role === "admin" && (
               <button
                 onClick={() => navigate("/admin")}
-                className="flex items-center gap-2 px-4 py-2 text-sm rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                className="flex items-center gap-2 px-3 lg:px-4 py-2 text-sm rounded-md bg-orange-600 text-white hover:bg-orange-700 transition whitespace-nowrap"
               >
                 <Shield size={16} />
-                Approvals
+                <span className="hidden lg:inline">Approvals</span>
+                <span className="lg:hidden">Admin</span>
               </button>
             )}
 
             {/* Logout */}
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-sm rounded-md border border-gray-300 hover:bg-red-50 hover:text-red-600 transition"
-            >
+              className="flex items-center gap-2 px-3 lg:px-4 py-2 text-sm rounded-md border border-gray-300 hover:bg-red-50 hover:text-red-600 transition whitespace-nowrap"  >
               <LogOut size={16} />
-              Logout
+              <span className="hidden lg:inline">Logout</span>
+              <span className="lg:hidden">Exit</span>
             </button>
           </div>
 
           {/* Mobile Toggle */}
           <button
-            className="md:hidden p-2 rounded-md hover:bg-gray-100"
+            className="md:hidden p-2 rounded-md hover:bg-gray-100 transition"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
-            <Menu size={20} />
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="md:hidden border-t pt-4 pb-2 space-y-3">
+          <div className="md:hidden border-t pt-4 pb-3 space-y-2">
 
-            <div>
-              <p className="text-sm font-medium text-gray-900">
+            {/* User */}
+            <div className="px-1 pb-2 border-b">
+              <p className="text-sm font-medium text-gray-900 truncate">
                 {user?.name}
               </p>
               <p className="text-xs text-gray-500 capitalize">
@@ -123,54 +120,45 @@ export default function Navbar({ user, setUser }) {
               </p>
             </div>
 
-            <button
-              onClick={() => handleNavigate("/")}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-gray-100"
-            >
-              <Home size={16} />
-              Home
-            </button>
+            <MobileBtn icon={<Home size={16} />} label="Home" onClick={() => handleNavigate("/")} />
 
             {user?.role === "student" && (
-              <button
-                onClick={() => handleNavigate("/submit")}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md bg-orange-600 text-white"
-              >
-                <Plus size={16} />
-                Submit Activity
-              </button>
+              <MobileBtn icon={<Plus size={16} />} label="Submit Activity" onClick={() => handleNavigate("/submit")} />
             )}
 
             {user?.role === "faculty" && (
-              <button
-                onClick={() => handleNavigate("/faculty")}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md bg-orange-600 text-white"
-              >
-                <FileCheck size={16} />
-                Review
-              </button>
+              <MobileBtn icon={<FileCheck size={16} />} label="Review Activities" onClick={() => handleNavigate("/faculty")} />
             )}
 
             {user?.role === "admin" && (
-              <button
-                onClick={() => handleNavigate("/admin")}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md bg-orange-600 text-white"
-              >
-                <Shield size={16} />
-                Approvals
-              </button>
+              <MobileBtn icon={<Shield size={16} />} label="Admin Panel" onClick={() => handleNavigate("/admin")} />
             )}
 
-            <button
+            <MobileBtn
+              icon={<LogOut size={16} />}
+              label="Logout"
+              danger
               onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md border border-gray-300 hover:bg-red-50 hover:text-red-600"
-            >
-              <LogOut size={16} />
-              Logout
-            </button>
+            />
           </div>
         )}
       </div>
     </nav>
+  );
+}
+
+/* Mobile Button Component */
+function MobileBtn({ icon, label, onClick, danger }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition
+        ${danger
+          ? "text-red-600 hover:bg-red-50"
+          : "text-gray-700 hover:bg-gray-100"}`}
+ >
+      {icon}
+      {label}
+    </button>
   );
 }
