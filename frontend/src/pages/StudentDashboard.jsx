@@ -88,6 +88,37 @@ export default function StudentDashboard({ user }) {
     }
   };
 
+
+  const handleDownloadCertificate = async (certificateId) => {
+    try {
+      const response = await apiClient.get(
+        `/certificates/download/${certificateId}`,
+        {
+          responseType: "blob",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${certificateId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to download certificate");
+    }
+  };
+
+
   const handleCopyLink = () => {
     const link =
       previewData?.shareableLink ||
@@ -205,7 +236,7 @@ export default function StudentDashboard({ user }) {
           stats={stats}
           certificationRate={certificationRate}
           activities={activities}
-          handleDownloadCertificate={() => { }}
+          handleDownloadCertificate={handleDownloadCertificate}
           navigate={navigate}
         />
       </div>

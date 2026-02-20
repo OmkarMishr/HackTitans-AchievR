@@ -7,7 +7,6 @@ export default function Hero({ user }) {
   const navigate = useNavigate();
   const [scrollOffset, setScrollOffset] = useState(0);
 
-  // Handle floating background animation on scroll
   useEffect(() => {
     const onScroll = () => {
       setScrollOffset(window.scrollY);
@@ -17,7 +16,6 @@ export default function Hero({ user }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // CTA navigation logic
   const handleCTA = () => {
     if (!user) {
       navigate("/register");
@@ -32,57 +30,66 @@ export default function Hero({ user }) {
   };
 
   return (
-    <section className="pt-28 pb-20 px-4 md:px-8 relative bg-white overflow-hidden">
+    <section className="relative pt-28 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-b from-white to-gray-50">
 
+      {/* Soft Glow Background */}
       <div
-        className="absolute top-20 right-0 w-72 md:w-96 h-72 md:h-96 bg-orange-100 rounded-full blur-3xl opacity-40"
-        style={{
-          transform: `translateY(${scrollOffset * 0.1}px)`
-        }} />
+        className="absolute top-24 right-[-100px] w-80 h-80 bg-orange-200 rounded-full blur-3xl opacity-30"
+        style={{ transform: `translateY(${scrollOffset * 0.08}px)` }} />
 
       <div className="max-w-7xl mx-auto">
 
-       <div className="grid md:grid-cols-3 gap-8 items-center md:items-center md:justify-items-center">
+        <div className="grid md:grid-cols-3 gap-10 items-center">
 
-          {/* Left Text */}
-         <div className="md:col-span-2 text-center md:text-left md:pr-10">
-          <h2 className="text-4xl sm:text-5xl md:text-7xl leading-tight font-light tracking-tight max-w-3xl mx-auto md:mx-0">
+          {/* LEFT CONTENT */}
+          <div className="md:col-span-2 text-center md:text-left">
+
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light leading-tight tracking-tight">
               Verified Achievements
               <br />
               That Recruiters
               <br />
-              <span className="bg-gradient-to-r from-orange-700 to-orange-500 bg-clip-text text-transparent">
-                Can Trust 
-                <br/>
-                Instantly
+              <span className="bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent font-medium">
+                Can Trust Instantly
               </span>
             </h2>
+
+            <p className="mt-6 text-gray-600 text-base sm:text-lg max-w-xl mx-auto md:mx-0">
+              Issue instant digital certificates and automatically build a
+              verified, recruiter-ready student portfolio.
+            </p>
+
+            {/* PREMIUM CTA */}
+            <div className="mt-8 flex justify-center md:justify-start">
+              <button
+                onClick={handleCTA}
+                className="group relative inline-flex items-center gap-2 px-8 py-3 rounded-xl
+                           bg-gradient-to-r from-orange-600 to-orange-500
+                           text-white text-sm sm:text-base font-medium
+                           shadow-lg shadow-orange-500/30
+                           hover:shadow-orange-500/50
+                           transition-all duration-300
+                           hover:-translate-y-1" >
+                {user ? "Go to Dashboard" : "Get Certified Instantly"}
+
+                <ArrowRight
+                  size={18}
+                  className="transition-transform duration-300 group-hover:translate-x-1"
+                />
+              </button>
+            </div>
           </div>
 
-          {/* Right Image */}
-          <div className="flex justify-center">
+          {/*RIGHT IMAGE- Hidden on Mobile */}
+          <div className="hidden md:flex justify-center">
             <img
               src={convocationHat}
               alt="Graduation Cap"
-              className="h-56 sm:h-72 md:h-80 transition-transform duration-300 hover:scale-110" />
+              className="h-72 lg:h-80 transition-transform duration-500 hover:scale-105"
+            />
           </div>
+
         </div>
-
-        {/* CTA Section */}
-        <div className="text-center mt-10 space-y-6">
-
-          <button onClick={handleCTA} className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg transition-transform duration-200 hover:scale-105">
-            {user ? "Go to Dashboard" : "Get Certified Instantly"}
-            <ArrowRight size={16} />
-          </button>
-
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            AchievR eliminates slow offline certificate distribution by issuing
-            instant digital certificates and automatically building a verified
-            student portfolio.
-          </p>
-        </div>
-
       </div>
     </section>
   );
