@@ -7,6 +7,7 @@ import Testimonials from "../components/Landing/Testimonials";
 import CTA from "../components/Landing/CTA";
 import Footer from "../components/Landing/Footer";
 import "../components/Landing/Animations.css";
+import FAQ from "../components/Landing/FAQ";
 
 export default function PremiumAchievRLanding({ user, setUser }) {
   return (
@@ -20,6 +21,7 @@ export default function PremiumAchievRLanding({ user, setUser }) {
       <Divider />
       <Testimonials />
       <CTA user={user} />
+      <FAQ/>
       <Footer />
     </div>
   );
