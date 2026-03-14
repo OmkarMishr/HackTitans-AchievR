@@ -26,7 +26,6 @@ const userSchema = new mongoose.Schema({
     index: true
   },
 
-  // STUDENT 
   rollNumber: {
     type: String,
     unique: true,
@@ -44,6 +43,7 @@ const userSchema = new mongoose.Schema({
   type: String,
   unique: true
 },
+
 
   //FACULTY / ADMIN 
   employeeId: {

@@ -37,12 +37,12 @@ const authMiddleware = require('./middleware/auth');
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/recruiter', require('./routes/recruiter'));
 
-app.use('/api/verify', require('./routes/verify'));
 
+app.use('/api/certificates', require('./routes/certificates'));
 
 // Protected
 app.use('/api/activities', authMiddleware, require('./routes/activities'));
-app.use('/api/certificates', authMiddleware, require('./routes/certificates'));
+
 
 // HEALTH CHECK
 app.get('/health', (req, res) => {
