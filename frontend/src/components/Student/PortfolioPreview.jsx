@@ -13,181 +13,208 @@ export default function PortfolioPreview({
   if (!previewOpen || !previewData) return null;
 
   const totalSkills =
-    previewData.skills.technical.length +
-    previewData.skills.soft.length +
-    previewData.skills.tools.length;
+    (previewData.skills?.technical?.length || 0) +
+    (previewData.skills?.soft?.length || 0) +
+    (previewData.skills?.tools?.length || 0);
+
+  const certifiedActivities = previewData.activities || [];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-
-      <div className="w-full max-w-5xl max-h-[92vh] overflow-hidden rounded-2xl bg-white shadow-2xl border border-gray-100 flex flex-col">
-
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-3 sm:p-4">
+      <div className="flex w-full max-w-5xl max-h-[92vh] flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b bg-white">
+        <div className="flex items-center justify-between border-b bg-white px-5 sm:px-6 py-4 sm:py-5">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">
-              Portfolio Preview
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+              Portfolio preview
             </h2>
-            <p className="text-sm text-gray-500">
-              A verified snapshot of achievements & skills
+            <p className="mt-0.5 text-xs sm:text-sm text-gray-500">
+              A verified summary of this student&apos;s work and skills.
             </p>
           </div>
 
-          <button onClick={() => setPreviewOpen(false)}
-            className="p-2 rounded-lg hover:bg-gray-100 transition" >
-            <X size={18} />
+          <button
+            type="button"
+            onClick={() => setPreviewOpen(false)}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition"
+          >
+            <X size={16} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto px-6 py-8 space-y-12">
-
+        <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-6 sm:py-8 space-y-10 sm:space-y-12">
           {/* Profile */}
-          <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-8">
-
+          <section className="rounded-xl border border-gray-100 bg-gray-50 px-5 sm:px-6 py-5 sm:py-6">
+            <div className="flex flex-col gap-6 sm:gap-8 md:flex-row md:items-center md:justify-between">
               <div>
-                <h3 className="text-2xl font-semibold text-gray-900">
-                  {previewData.student.name}
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-900">
+                  {previewData.student?.name}
                 </h3>
 
-                <div className="mt-3 text-sm text-gray-600 space-y-1">
-                  <p>🎓 {previewData.student.rollNumber}</p>
-                  <p>💻 {previewData.student.department}</p>
-                  <p className="break-all">✉️ {previewData.student.email}</p>
+                <div className="mt-3 space-y-1 text-xs sm:text-sm text-gray-600">
+                  {previewData.student?.rollNumber && (
+                    <p>
+                      <span className="font-medium text-gray-800">ID:</span>{" "}
+                      {previewData.student.rollNumber}
+                    </p>
+                  )}
+                  {previewData.student?.department && (
+                    <p>
+                      <span className="font-medium text-gray-800">
+                        Department:
+                      </span>{" "}
+                      {previewData.student.department}
+                    </p>
+                  )}
+                  {previewData.student?.email && (
+                    <p className="break-all">
+                      <span className="font-medium text-gray-800">Email:</span>{" "}
+                      {previewData.student.email}
+                    </p>
+                  )}
                 </div>
               </div>
 
-              <div className="flex gap-10">
-                <Stat label="Verified Achievements" value={previewData.totalCertifiedActivities} />
-                <Stat label="Total Skills" value={totalSkills} />
+              <div className="flex flex-1 justify-start sm:justify-end gap-8 sm:gap-10">
+                <Stat
+                  label="Verified certificates"
+                  value={previewData.totalCertifiedActivities || 0}
+                />
+                <Stat label="Skills recorded" value={totalSkills} />
               </div>
             </div>
-          </div>
+          </section>
 
           {/* Skills */}
           {totalSkills > 0 && (
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-6">
-                Skills & Capabilities
+            <section>
+              <h4 className="mb-4 sm:mb-5 text-base sm:text-lg font-semibold text-gray-900">
+                Skill overview
               </h4>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-3">
                 {[
-                  ["Technical Skills", previewData.skills.technical],
-                  ["Soft Skills", previewData.skills.soft],
-                  ["Tools & Tech", previewData.skills.tools],
-                ].map(([title, list]) =>
-                  list.length > 0 && (
+                  ["Technical", previewData.skills.technical],
+                  ["Soft skills", previewData.skills.soft],
+                  ["Tools & tech", previewData.skills.tools],
+                ].map(([title, list]) => {
+                  const skills = list || [];
+                  if (!skills.length) return null;
+
+                  return (
                     <div
                       key={title}
-                      className="border border-gray-100 rounded-xl p-5 bg-white shadow-sm"
+                      className="rounded-xl border border-gray-100 bg-white p-4 sm:p-5 shadow-sm"
                     >
-                      <p className="text-sm font-medium text-gray-700 mb-3">
+                      <p className="mb-3 text-xs sm:text-sm font-medium text-gray-800">
                         {title}
                       </p>
-
-                      <div className="flex flex-wrap gap-2">
-                        {list.map((item, index) => (
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                        {skills.map((item, index) => (
                           <span
                             key={`${item}-${index}`}
-                            className="px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-medium"
+                            className="rounded-full bg-gray-100 px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs font-medium text-gray-800"
                           >
                             {item}
                           </span>
                         ))}
                       </div>
                     </div>
-                  )
-                )}
+                  );
+                })}
               </div>
-            </div>
+            </section>
           )}
 
-          {/* Certificates */}
-          {previewData.activities.length > 0 && (
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-6">
-                Certified Achievements
+          {/* Certified achievements */}
+          {certifiedActivities.length > 0 && (
+            <section>
+              <h4 className="mb-4 sm:mb-5 text-base sm:text-lg font-semibold text-gray-900">
+                Issued certificates
               </h4>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {previewData.activities.map((activity) => (
-                  <div
+              <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
+                {certifiedActivities.map((activity) => (
+                  <button
                     key={activity._id}
+                    type="button"
                     onClick={() => handleViewCertificateDetails(activity)}
-                    className="border border-gray-100 rounded-xl p-5 bg-white shadow-sm hover:shadow-md hover:border-orange-300 transition cursor-pointer"
+                    className="flex flex-col rounded-xl border border-gray-100 bg-white p-4 sm:p-5 text-left shadow-sm transition hover:border-gray-300 hover:shadow-md"
                   >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-base font-semibold text-gray-900">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm sm:text-base font-semibold text-gray-900">
                           {activity.title}
                         </p>
-
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="mt-1 text-xs sm:text-sm text-gray-500">
                           {activity.category} • {activity.achievementLevel}
                         </p>
                       </div>
-
-                      <CheckCircle size={18} className="text-emerald-500" />
+                      <CheckCircle
+                        size={18}
+                        className="mt-0.5 flex-shrink-0 text-emerald-500"
+                      />
                     </div>
 
-                    <p className="text-xs text-gray-500 mt-4">
+                    <p className="mt-3 text-[11px] sm:text-xs text-gray-500">
                       Issued on{" "}
                       {formatDate(
                         activity.issuedAt ||
-                        activity.certifiedAt ||
-                        activity.eventDate ||
-                        activity.createdAt
+                          activity.certifiedAt ||
+                          activity.eventDate ||
+                          activity.createdAt
                       )}
                     </p>
-                  </div>
+                  </button>
                 ))}
               </div>
-            </div>
+            </section>
           )}
 
-          {/* Share Section */}
-          <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-            <p className="text-sm font-medium text-gray-900 mb-3">
-              Share this portfolio
+          {/* Share section */}
+          <section className="rounded-xl border border-gray-100 bg-gray-50 px-5 sm:px-6 py-5 sm:py-6">
+            <p className="mb-2 text-sm font-medium text-gray-900">
+              Share with recruiters
+            </p>
+            <p className="mb-3 text-[11px] sm:text-xs text-gray-500">
+              Send this link in applications, emails, or LinkedIn messages. It
+              opens a read‑only, verified version of this portfolio.
             </p>
 
-            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2">
-              <p className="text-xs text-gray-600 truncate flex-1">
+            <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5">
+              <p className="flex-1 truncate text-xs sm:text-sm text-gray-600">
                 {previewData.shareableLink}
               </p>
-
               <button
+                type="button"
                 onClick={handleCopyLink}
-                className="p-1 rounded hover:bg-gray-100 transition"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-gray-100 transition"
               >
-                <Copy size={16} className="text-orange-600" />
+                <Copy size={16} className="text-gray-700" />
               </button>
             </div>
-          </div>
-
+          </section>
         </div>
 
-        {/* Footer */}
-        <div className="border-t bg-white p-4 flex flex-col sm:flex-row gap-3">
-
-
+        {/* Footer actions */}
+        <div className="flex flex-col gap-2.5 sm:flex-row border-t bg-white px-4 sm:px-5 py-3 sm:py-4">
           <button
+            type="button"
             onClick={handleShare}
-            className=" flex-1 border border-gray-300 text-gray-700 rounded-lg py-2.5 text-sm font-medium hover:bg-gray-50 transition"
+            className="inline-flex flex-1 items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 transition"
           >
-            Share Portfolio
+            Share portfolio
           </button>
 
           <button
+            type="button"
             onClick={handleOpenInNewTab}
-            className="flex-1 bg-orange-600 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-orange-700 transition flex items-center justify-center gap-2"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-orange-600 px-3 py-2.5 text-sm font-medium text-white hover:bg-orange-700 transition"
           >
             <ExternalLink size={16} />
-            View Full Portfolio
+            View full portfolio
           </button>
-
         </div>
       </div>
     </div>
@@ -197,8 +224,12 @@ export default function PortfolioPreview({
 function Stat({ label, value }) {
   return (
     <div className="text-center">
-      <p className="text-xs uppercase text-gray-400 tracking-wide">{label}</p>
-      <p className="text-3xl font-semibold text-gray-900 mt-1">{value}</p>
+      <p className="text-[11px] uppercase tracking-wide text-gray-400">
+        {label}
+      </p>
+      <p className="mt-1 text-2xl sm:text-3xl font-semibold text-gray-900">
+        {value}
+      </p>
     </div>
   );
 }

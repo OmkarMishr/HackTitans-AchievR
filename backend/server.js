@@ -37,6 +37,9 @@ const authMiddleware = require('./middleware/auth');
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/recruiter', require('./routes/recruiter'));
 
+app.use('/api/verify', require('./routes/verify'));
+
+
 // Protected
 app.use('/api/activities', authMiddleware, require('./routes/activities'));
 app.use('/api/certificates', authMiddleware, require('./routes/certificates'));

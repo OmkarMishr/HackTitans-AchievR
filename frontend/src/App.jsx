@@ -69,7 +69,7 @@ export default function App() {
           <Route path="/admin" element={<><Navbar user={user} setUser={setUser} /><AdminDashboard user={user} /></>} />
         )}
 
-        <Route path="*" element={<Navigate to="/" />} />
+        {/* <Route path="*" element={<Navigate to="/" />} /> */}
       </Routes>
     </Router>
   );

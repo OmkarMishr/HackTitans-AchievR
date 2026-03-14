@@ -70,42 +70,80 @@ exports.generateCertificate = async (req, res) => {
   }
 };
 
-
-//  VERIFY CERTIFICATE 
+// VERIFY CERTIFICATE (PUBLIC - no auth needed)
 exports.verifyCertificate = async (req, res) => {
   try {
     const { certificateId } = req.params;
 
+    // Fetch with populated data
     const certificate = await Certificate.findOne({ certificateId })
-      .populate('student', 'name rollNumber department')
-      .populate('activity', 'title category');
+      .populate('student', 'name rollNumber department email')
+      .populate('activity', 'title category organizingBody achievementLevel eventDate')
+      .lean();  // lean() for faster response
 
     if (!certificate) {
       return res.status(404).json({
-        verified: false,
-        message: 'Certificate not found'
+        status: "not_found",
+        message: "Certificate not found. Please check the ID.",
       });
     }
 
-    res.json({
-      verified: true,
+    // Check validity
+    const isValid = certificate.status === 'active' &&
+      !certificate.isRevoked &&
+      (!certificate.expiresAt || certificate.expiresAt > new Date());
+
+    if (!isValid) {
+      return res.status(410).json({
+        status: "invalid",
+        message: "This certificate is no longer valid.",
+        data: {
+          certificateId: certificate.certificateId,
+          studentName: certificate.student?.name || 'N/A',
+          title: certificate.activity?.title || 'N/A',
+          issuedAt: certificate.issuedAt,
+          status: certificate.status,
+        },
+      });
+    }
+
+    // Success response (lightweight, recruiter-friendly)
+    const payload = {
+      status: "valid",
       data: {
         certificateId: certificate.certificateId,
-        student: certificate.student.name,
+        studentName: certificate.student.name,
         rollNumber: certificate.student.rollNumber,
         department: certificate.student.department,
         title: certificate.activity.title,
         category: certificate.activity.category,
-        issuedAt: certificate.createdAt,
-        status: certificate.status
+        organizingBody: certificate.activity.organizingBody,
+        achievementLevel: certificate.activity.achievementLevel,
+        eventDate: certificate.activity.eventDate,
+        issuedAt: certificate.issuedAt,
+        verificationCount: certificate.verificationCount || 0,
+      },
+    };
+
+    // Increment verification stats (fire-and-forget, no await)
+    Certificate.updateOne(
+      { _id: certificate._id },
+      {
+        $inc: { verificationCount: 1 },
+        $set: { lastVerifiedAt: new Date() },
       }
-    });
+    ).catch(console.error);
+
+    return res.json(payload);
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Verify certificate error:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Verification service temporarily unavailable.",
+    });
   }
 };
-
 
 //  CERTIFICATE STATS 
 exports.getStats = async (req, res) => {
