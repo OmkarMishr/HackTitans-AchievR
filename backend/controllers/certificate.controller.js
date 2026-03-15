@@ -3,8 +3,7 @@ const Activity = require('../models/Activity');
 const crypto = require('crypto');
 const certificateService = require('../services/certificateService');
 
-
-//GENERATE CERTIFICATE
+// Generate certificate for approved activity (admin/faculty)
 exports.generateCertificate = async (req, res) => {
   try {
     const { activityId } = req.params;
@@ -12,13 +11,15 @@ exports.generateCertificate = async (req, res) => {
     const activity = await Activity.findById(activityId)
       .populate('student', 'name email rollNumber department');
 
-    if (!activity) {
-      return res.status(404).json({ error: 'Activity not found' });
+    if (!activity || activity.status !== 'approved') {
+      return res.status(404).json({ error: 'Approved activity not found' });
     }
 
+    // Simple unique ID
     const certificateId = `CERT_${Date.now()}`;
     const verificationCode = crypto.randomBytes(10).toString('hex');
 
+    // Generate PDF via service
     const result = await certificateService.generateCertificate({
       studentName: activity.student.name,
       achievement: activity.title,
@@ -31,9 +32,10 @@ exports.generateCertificate = async (req, res) => {
     });
 
     if (!result.success) {
-      return res.status(500).json({ error: result.error });
+      return res.status(500).json({ error: result.error || 'PDF generation failed' });
     }
 
+    // Save to DB
     const certificate = new Certificate({
       certificateId,
       activity: activity._id,
@@ -43,13 +45,14 @@ exports.generateCertificate = async (req, res) => {
       organizingBody: activity.organizingBody,
       achievementLevel: activity.achievementLevel,
       eventDate: activity.eventDate,
-      pdfPath: `virtual://${certificateId}`,
+      pdfPath: `virtual://${certificateId}`,  // on-demand generation
       verificationCode,
       status: 'active'
     });
 
     await certificate.save();
 
+    // Link back to activity
     await Activity.findByIdAndUpdate(activityId, {
       certificate: certificate._id,
       certificateId,
@@ -57,114 +60,142 @@ exports.generateCertificate = async (req, res) => {
       certificateGeneratedAt: new Date()
     });
 
+    // Stream PDF
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=${certificateId}.pdf`
-    );
-
+    res.setHeader('Content-Disposition', `attachment; filename="${certificateId}.pdf"`);
     res.send(result.pdfBuffer);
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Generate cert error:', error);
+    res.status(500).json({ error: 'Something went wrong generating certificate' });
   }
 };
 
-
-//  VERIFY CERTIFICATE 
+// Public verify endpoint - recruiters paste cert ID here
 exports.verifyCertificate = async (req, res) => {
   try {
     const { certificateId } = req.params;
 
-    const certificate = await Certificate.findOne({ certificateId })
-      .populate('student', 'name rollNumber department')
-      .populate('activity', 'title category');
+    const cert = await Certificate.findOne({ certificateId })
+      .populate('student', 'name rollNumber department email')
+      .populate('activity', 'title category organizingBody achievementLevel eventDate')
+      .lean();
 
-    if (!certificate) {
+    if (!cert) {
       return res.status(404).json({
-        verified: false,
-        message: 'Certificate not found'
+        status: 'not_found',
+        message: 'Certificate not found. Double-check the ID.'
       });
     }
 
-    res.json({
-      verified: true,
-      data: {
-        certificateId: certificate.certificateId,
-        student: certificate.student.name,
-        rollNumber: certificate.student.rollNumber,
-        department: certificate.student.department,
-        title: certificate.activity.title,
-        category: certificate.activity.category,
-        issuedAt: certificate.createdAt,
-        status: certificate.status
+    // Is it still valid?
+    const now = new Date();
+    const isValid = cert.status === 'active' &&
+      !cert.isRevoked &&
+      (!cert.expiresAt || cert.expiresAt > now);
+
+    if (!isValid) {
+      return res.status(410).json({
+        status: 'invalid',
+        message: 'Certificate expired, revoked, or cancelled.',
+        data: {
+          certId: cert.certificateId,
+          student: cert.student?.name || 'Unknown',
+          title: cert.activity?.title || 'Achievement',
+          issued: cert.issuedAt
+        }
+      });
+    }
+
+    // Valid! Send recruiter-friendly response
+    const data = {
+      status: 'valid',
+      certId: cert.certificateId,
+      student: cert.student.name,
+      rollNo: cert.student.rollNumber,
+      department: cert.student.department,
+      achievement: cert.activity.title,
+      category: cert.activity.category,
+      organizer: cert.activity.organizingBody,
+      level: cert.activity.achievementLevel,
+      eventDate: cert.activity.eventDate,
+      issued: cert.issuedAt,
+      verifiedCount: cert.verificationCount || 0
+    };
+
+    // Track verification (async, don't block)
+    Certificate.updateOne({ _id: cert._id }, {
+      $inc: { verificationCount: 1 },
+      $set: { lastVerifiedAt: now }
+    }).catch(err => console.log('Stats update failed:', err));
+
+    res.json(data);
+
+  } catch (error) {
+    console.error('Verify error:', error.message);
+    res.status(500).json({
+      status: 'error',
+      message: 'Service temporarily down. Try again in a minute.'
+    });
+  }
+};
+
+// Admin dashboard stats
+exports.getStats = async (req, res) => {
+  try {
+    const stats = await Certificate.aggregate([{
+      $facet: {
+        total: [{ $count: 'count' }],
+        active: [{ $match: { status: 'active' } }, { $count: 'count' }],
+        revoked: [{ $match: { isRevoked: true } }, { $count: 'count' }]
       }
+    }]);
+
+    res.json({
+      success: true,
+      stats: stats[0] || { total: [{ count: 0 }], active: [{ count: 0 }], revoked: [{ count: 0 }] }
     });
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Stats error:', error);
+    res.status(500).json({ error: 'Stats unavailable' });
   }
 };
 
-
-//  CERTIFICATE STATS 
-exports.getStats = async (req, res) => {
-  try {
-    const stats = await Certificate.aggregate([
-      {
-        $facet: {
-          total: [{ $count: 'count' }],
-          active: [{ $match: { status: 'active' } }, { $count: 'count' }],
-          revoked: [{ $match: { isRevoked: true } }, { $count: 'count' }]
-        }
-      }
-    ]);
-
-    res.json({ success: true, stats: stats[0] });
-
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-
-// DOWNLOAD CERTIFICATE
+// Student re-downloads their cert PDF
 exports.downloadCertificate = async (req, res) => {
   try {
     const { certificateId } = req.params;
 
-    const certificate = await Certificate.findOne({ certificateId })
+    const cert = await Certificate.findOne({ certificateId })
       .populate('student', 'name rollNumber department')
-      .populate('activity', 'title');
+      .populate('activity', 'title organizingBody eventDate achievementLevel');
 
-    if (!certificate) {
-      return res.status(404).json({ error: 'Certificate not found' });
+    if (!cert || cert.status !== 'active') {
+      return res.status(404).json({ error: 'Certificate not found or expired' });
     }
 
     const result = await certificateService.generateCertificate({
-      studentName: certificate.student.name,
-      achievement: certificate.activity.title,
-      organizingBody: certificate.organizingBody,
-      eventDate: certificate.eventDate,
-      achievementLevel: certificate.achievementLevel,
-      certificateId: certificate.certificateId,
-      rollNo: certificate.student.rollNumber,
-      department: certificate.student.department
+      studentName: cert.student.name,
+      achievement: cert.activity.title,
+      organizingBody: cert.activity.organizingBody,
+      eventDate: cert.activity.eventDate,
+      achievementLevel: cert.activity.achievementLevel,
+      certificateId: cert.certificateId,
+      rollNo: cert.student.rollNumber,
+      department: cert.student.department
     });
 
     if (!result.success) {
-      return res.status(500).json({ error: 'Failed to generate PDF' });
+      return res.status(500).json({ error: 'PDF generation failed' });
     }
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=${certificate.certificateId}.pdf`
-    );
-
+    res.setHeader('Content-Disposition', `attachment; filename="${cert.certificateId}.pdf"`);
     res.send(result.pdfBuffer);
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Download error:', error);
+    res.status(500).json({ error: 'Download failed' });
   }
 };

@@ -61,6 +61,9 @@ export default function SubmitActivity() {
     if (selectedSkills.technicalSkills.length === 0 &&
       selectedSkills.softSkills.length === 0 &&
       selectedSkills.tools.length === 0) {
+    if (selectedSkills.technicalSkills.length === 0 &&
+      selectedSkills.softSkills.length === 0 &&
+      selectedSkills.tools.length === 0) {
       setError('Please select at least one skill');
       return;
     }
@@ -111,6 +114,7 @@ export default function SubmitActivity() {
               <GraduationCap size={22} className="text-white sm:hidden" />
               <GraduationCap size={28} className="text-white hidden sm:block" />
             </div>
+
             <div>
               <h1 className="text-2xl sm:text-4xl font-light text-gray-900">Submit Achievement</h1>
               <p className="text-gray-500 font-light mt-0.5 sm:mt-1 text-sm sm:text-base">
@@ -122,6 +126,7 @@ export default function SubmitActivity() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-8 py-6 sm:py-12">
+
         {/* Success Alert */}
         {success && (
           <div className="mb-6 sm:mb-8 bg-green-50 border-2 border-green-300 rounded-xl p-4 sm:p-6 flex items-start gap-3 sm:gap-4 animate-fadeInUp">
@@ -148,11 +153,13 @@ export default function SubmitActivity() {
 
           {/* Activity Details Section */}
           <div className="bg-white p-5 sm:p-8 rounded-2xl border-2 border-gray-100 shadow-lg hover:shadow-xl transition duration-300">
+
             <div className="flex items-center gap-3 mb-6 sm:mb-8">
               <div className="bg-gradient-to-br from-orange-600 to-orange-500 p-2 sm:p-3 rounded-lg flex-shrink-0">
                 <FileText size={20} className="text-white sm:hidden" />
                 <FileText size={24} className="text-white hidden sm:block" />
               </div>
+
               <div>
                 <h2 className="text-xl sm:text-2xl font-light text-gray-900">Activity Details</h2>
                 <p className="text-gray-500 font-light text-xs sm:text-sm mt-0.5 sm:mt-1">
@@ -162,11 +169,13 @@ export default function SubmitActivity() {
             </div>
 
             <div className="space-y-5 sm:space-y-6">
+
               {/* Title */}
               <div>
                 <label className="block text-gray-700 font-normal mb-2 sm:mb-3 text-sm sm:text-base">
                   Achievement Title *
                 </label>
+
                 <input
                   type="text"
                   name="title"
@@ -183,6 +192,7 @@ export default function SubmitActivity() {
                 <label className="block text-gray-700 font-normal mb-2 sm:mb-3 text-sm sm:text-base">
                   Detailed Description *
                 </label>
+
                 <textarea
                   name="description"
                   value={formData.description}
@@ -193,12 +203,14 @@ export default function SubmitActivity() {
                 />
               </div>
 
-              {/* Category and Date Grid */}
+              {/* Category & Date */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+
                 <div>
                   <label className="block text-gray-700 font-normal mb-2 sm:mb-3 text-sm sm:text-base">
                     Category *
                   </label>
+
                   <select
                     name="category"
                     value={formData.category}
@@ -219,6 +231,7 @@ export default function SubmitActivity() {
                   <label className="block text-gray-700 font-normal mb-2 sm:mb-3 text-sm sm:text-base">
                     Event Date *
                   </label>
+
                   <input
                     type="date"
                     name="eventDate"
@@ -230,12 +243,14 @@ export default function SubmitActivity() {
                 </div>
               </div>
 
-              {/* Organizing Body and Achievement Level Grid */}
+              {/* Organizing Body */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+
                 <div>
                   <label className="block text-gray-700 font-normal mb-2 sm:mb-3 text-sm sm:text-base">
                     Organizing Body
                   </label>
+
                   <input
                     type="text"
                     name="organizingBody"
@@ -250,6 +265,7 @@ export default function SubmitActivity() {
                   <label className="block text-gray-700 font-normal mb-2 sm:mb-3 text-sm sm:text-base">
                     Achievement Level
                   </label>
+
                   <select
                     name="achievementLevel"
                     value={formData.achievementLevel}
@@ -270,6 +286,7 @@ export default function SubmitActivity() {
                 <label className="block text-gray-700 font-normal mb-2 sm:mb-3 text-sm sm:text-base">
                   Proof Document (Optional)
                 </label>
+
                 <div
                   onDragEnter={handleDrag}
                   onDragLeave={handleDrag}
@@ -287,7 +304,9 @@ export default function SubmitActivity() {
                     id="file-input"
                     accept=".pdf,.jpg,.png,.jpeg"
                   />
+
                   <label htmlFor="file-input" className="cursor-pointer block">
+
                     {file ? (
                       <div className="flex items-center justify-center gap-3">
                         <CheckCircle2 size={28} className="text-green-600 flex-shrink-0" />
@@ -308,19 +327,23 @@ export default function SubmitActivity() {
                         </p>
                       </div>
                     )}
+
                   </label>
                 </div>
               </div>
+
             </div>
           </div>
 
-          {/* Skills Selection Section */}
+          {/* Skills Section */}
           <div className="bg-white p-5 sm:p-8 rounded-2xl border-2 border-gray-100 shadow-lg hover:shadow-xl transition duration-300">
+
             <div className="flex items-center gap-3 mb-6 sm:mb-8">
               <div className="bg-gradient-to-br from-orange-600 to-orange-500 p-2 sm:p-3 rounded-lg flex-shrink-0">
                 <Loader size={20} className="text-white sm:hidden" />
                 <Loader size={24} className="text-white hidden sm:block" />
               </div>
+
               <div>
                 <h2 className="text-xl sm:text-2xl font-light text-gray-900">Select Your Skills</h2>
                 <p className="text-gray-500 font-light text-xs sm:text-sm mt-0.5 sm:mt-1">
@@ -335,11 +358,15 @@ export default function SubmitActivity() {
               </p>
             </div>
 
-            <SkillSelector selectedSkills={selectedSkills} setSelectedSkills={setSelectedSkills} />
+            <SkillSelector
+              selectedSkills={selectedSkills}
+              setSelectedSkills={setSelectedSkills}
+            />
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+
             <button
               type="submit"
               disabled={loading}
@@ -354,7 +381,7 @@ export default function SubmitActivity() {
                 </>
               ) : (
                 <>
-                  <Upload size={20} className="group-hover:scale-110 transition" />
+                  <Upload size={20} />
                   Submit Achievement for Verification
                 </>
               )}
@@ -373,12 +400,12 @@ export default function SubmitActivity() {
 
       {/* Animations */}
       <style>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeInUp { animation: fadeInUp 0.5s ease-out; }
-      `}</style>
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fadeInUp { animation: fadeInUp 0.5s ease-out; }
+    `}</style>
     </div>
   );
 }

@@ -22,8 +22,8 @@ export default function Navbar({ user, setUser }) {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto h-16 px-4 sm:px-6 flex items-center justify-between">
+    <nav className=" top-0 w-full z-50 bg-white/80 backdrop-blur shadow-sm">
+      <div className="max-w-7xl mx-auto mt-2 h-14 px-4 sm:px-6 flex items-center justify-between">
         <div
           className="flex items-center cursor-pointer"
           onClick={() => navigate("/")}

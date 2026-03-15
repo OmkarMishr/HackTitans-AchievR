@@ -41,25 +41,16 @@ const certificateSchema = new mongoose.Schema({
 
   eventDate: Date,
 
-  // FILES
+
   pdfUrl: String,
   pdfPath: { type: String, required: true },
 
   qrCodeUrl: String,
   qrCodePath: String,
 
-  // VERIFICATION
-  verificationCode: {
-    type: String,
-    unique: true,
-    sparse: true,
-    required: true,
-    index: true
-  },
-
   status: {
     type: String,
-    enum: ['active', 'revoked', 'expired', 'pending'],
+    enum: ['active', 'revoked'],
     default: 'active',
     index: true
   },
@@ -74,36 +65,17 @@ const certificateSchema = new mongoose.Schema({
     default: () => new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
   },
 
-  verificationCount: { type: Number, default: 0 },
-
-  verificationHistory: [{
-    verifiedAt: { type: Date, default: Date.now },
-    verifiedBy: { type: String, default: 'public' },
-    ipAddress: String
-  }],
-
-  lastVerifiedAt: Date,
-
-  // USAGE TRACKING
-  downloadCount: { type: Number, default: 0 },
-  viewCount: { type: Number, default: 0 },
-
-  lastDownloadedAt: Date,
-  lastViewedAt: Date,
-
-  shareCount: { type: Number, default: 0 }
-
 }, {
   timestamps: true,
   collection: 'certificates'
 });
 
-//NDEXES 
+
+certificateSchema.index({ certificateId: 1 }, { unique: true });
 certificateSchema.index({ student: 1, issuedAt: -1 });
 certificateSchema.index({ status: 1 });
-certificateSchema.index({ verificationCode: 1 });
 
-// VIRTUALS
+
 certificateSchema.virtual('isValid').get(function () {
   return (
     this.status === 'active' &&
@@ -118,17 +90,6 @@ certificateSchema.virtual('daysUntilExpiry').get(function () {
 });
 
 //METHODS
-certificateSchema.methods.recordVerification = function (email, ipAddress) {
-  this.verificationHistory.push({
-    verifiedBy: email,
-    ipAddress
-  });
-
-  this.verificationCount += 1;
-  this.lastVerifiedAt = new Date();
-  return this.save();
-};
-
 certificateSchema.methods.revoke = function (reason) {
   this.isRevoked = true;
   this.status = 'revoked';
@@ -137,7 +98,7 @@ certificateSchema.methods.revoke = function (reason) {
   return this.save();
 };
 
-// STATICS
+// STATs
 certificateSchema.statics.findByStudent = function (studentId) {
   return this.find({ student: studentId }).sort({ issuedAt: -1 });
 };

@@ -1,8 +1,6 @@
 const Activity = require('../models/Activity');
 const StudentSkills = require('../models/StudentSkills');
-const User = require('../models/User');
 
-// SUBMIT ACTIVITY 
 exports.submitActivity = async (req, res) => {
     try {
         const {
@@ -48,8 +46,7 @@ exports.submitActivity = async (req, res) => {
 
         await activity.save();
 
-        // UPDATE STUDENT SKILLS
-        let studentSkills = await StudentSkills.findOne({ student: studentId });
+        let studentSkills = await StudentSkills.findOne({ student: studentId }); //update student skills
 
         if (!studentSkills) {
             studentSkills = new StudentSkills({ student: studentId });
@@ -89,8 +86,8 @@ exports.submitActivity = async (req, res) => {
     }
 };
 
-// GET MY ACTIVITIES
-exports.getMyActivities = async (req, res) => {
+
+exports.getMyActivities = async (req, res) => {     // for portfolio , activity gets updated
     try {
         const activities = await Activity.find({ student: req.user.userId })
             .populate('reviewedBy', 'name')
@@ -103,8 +100,8 @@ exports.getMyActivities = async (req, res) => {
     }
 };
 
-// APPROVE ACTIVITY
-exports.approveActivity = async (req, res) => {
+
+exports.approveActivity = async (req, res) => {         //this will done by faculty
     try {
         const { comment } = req.body;
         const activityId = req.params.id;
@@ -130,8 +127,8 @@ exports.approveActivity = async (req, res) => {
     }
 };
 
-//  REJECT ACTIVITY
-exports.rejectActivity = async (req, res) => {
+
+exports.rejectActivity = async (req, res) => {   // faculty
     try {
         const { reason } = req.body;
         const activityId = req.params.id;
@@ -158,8 +155,8 @@ exports.rejectActivity = async (req, res) => {
     }
 };
 
-// GET FACULTY PENDING ACTIVITIES
-exports.getFacultyPendingActivities = async (req, res) => {
+
+exports.getFacultyPendingActivities = async (req, res) => {   // get pending activities
     try {
         const activities = await Activity.find({ status: 'pending' })
             .populate('student', 'name rollNumber department')
@@ -172,13 +169,13 @@ exports.getFacultyPendingActivities = async (req, res) => {
     }
 };
 
-// GET ALL ACTIVITIES (ADMIN)
-exports.getAllActivitiesAdmin = async (req, res) => {
+
+exports.getAllActivitiesAdmin = async (req, res) => {           // all activites admin
     try {
         const activities = await Activity.find()
             .populate('student', 'name rollNumber department email')
             .populate('reviewedBy', 'name email')
-            .sort({ createdAt: -1 });
+            .sort({ submittedAt: -1 })
 
         res.json({ success: true, count: activities.length, activities });
 
@@ -187,8 +184,8 @@ exports.getAllActivitiesAdmin = async (req, res) => {
     }
 };
 
-// GET APPROVED ACTIVITIES (ADMIN)
-exports.getApprovedActivitiesAdmin = async (req, res) => {
+
+exports.getApprovedActivitiesAdmin = async (req, res) => {          // approved by admin
     try {
         const activities = await Activity.find({ status: 'approved' })
             .populate('student', 'name rollNumber department email')

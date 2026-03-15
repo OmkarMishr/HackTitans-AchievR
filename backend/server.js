@@ -8,7 +8,7 @@ require('dotenv').config();
 
 const app = express();
 
-//  MIDDLEWARe
+//middlewares
 app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
@@ -33,15 +33,13 @@ connectDB();
 // ROUTES
 const authMiddleware = require('./middleware/auth');
 
-// Public
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/recruiter', require('./routes/recruiter'));
+app.use('/api/certificates', require('./routes/certificates'));
 
-// Protected
 app.use('/api/activities', authMiddleware, require('./routes/activities'));
-app.use('/api/certificates', authMiddleware, require('./routes/certificates'));
 
-// HEALTH CHECK
+//health
 app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
@@ -60,7 +58,7 @@ app.use((req, res) => {
 });
 
 // ERROR HANDLER
-app.use((err, req, res, next) => {
+app.use((err, res) => {
   console.error('Error:', err.message);
 
   res.status(err.status || 500).json({
@@ -68,7 +66,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// START SERVER
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log('\n' + '='.repeat(60));
