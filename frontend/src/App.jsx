@@ -11,6 +11,7 @@ import StudentProfile from './pages/StudentProfile';
 import Navbar from './components/Navbar'
 import VerifyCertificate from './pages/VerifyCertificate'
 import RecruiterPortfolio from './pages/RecruiterPortfolio';
+import ValidateCertificate from './pages/validateCertificate'
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -68,6 +69,7 @@ export default function App() {
         )}
 
         <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/verify" element={<ValidateCertificate />} />
       </Routes>
     </Router>
   );

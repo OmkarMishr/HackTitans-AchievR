@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
+import { LayoutDashboard, LogOut, ChevronDown, ShieldCheck } from "lucide-react";
 import achievrLogo from "../../assets/achievr-logo.png";
 
 export default function Navbar({ user, setUser }) {
@@ -16,23 +16,18 @@ export default function Navbar({ user, setUser }) {
 
   const goToDashboard = () => {
     if (!user) return navigate("/login");
-    const path =
-      user.role === "student" ? "/dashboard" : `/${user.role}`;
+    const path = user.role === "student" ? "/dashboard" : `/${user.role}`;
     navigate(path);
   };
 
   return (
-    <nav className=" top-0 w-full z-50 bg-white/80 backdrop-blur shadow-sm">
+    <nav className="top-0 w-full z-50 bg-white/80 backdrop-blur shadow-sm">
       <div className="max-w-7xl mx-auto mt-2 h-14 px-4 sm:px-6 flex items-center justify-between">
         <div
           className="flex items-center cursor-pointer"
           onClick={() => navigate("/")}
         >
-          <img
-            src={achievrLogo}
-            alt="AchievR"
-            className="h-8 sm:h-10"
-          />
+          <img src={achievrLogo} alt="AchievR" className="h-8 sm:h-10" />
         </div>
 
         {/* Right side */}
@@ -47,6 +42,16 @@ export default function Navbar({ user, setUser }) {
             <LayoutDashboard size={20} className="text-gray-600" />
           </button>
 
+          {/* Verify Certificate */}
+          <button
+            onClick={() => navigate("/verify")}
+            title="Verify Certificate"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+          >
+            <ShieldCheck size={16} />
+            <span className="hidden sm:inline">Verify</span>
+          </button>
+
           {user ? (
             <div className="relative">
 
@@ -58,15 +63,12 @@ export default function Navbar({ user, setUser }) {
                 <div className="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center text-xs font-semibold">
                   {user.name?.charAt(0)?.toUpperCase()}
                 </div>
-
                 <span className="hidden sm:block text-sm font-medium text-gray-700">
                   {user.name}
                 </span>
-
                 <ChevronDown
                   size={16}
-                  className={`text-gray-500 transition ${dropdownOpen ? "rotate-180" : ""
-                    }`}
+                  className={`text-gray-500 transition ${dropdownOpen ? "rotate-180" : ""}`}
                 />
               </button>
 
@@ -76,16 +78,11 @@ export default function Navbar({ user, setUser }) {
 
                   {/* User details */}
                   <div className="px-4 py-3 border-b bg-gray-50">
-                    <p className="text-sm font-semibold text-gray-900">
-                      {user.name}
-                    </p>
-                    <p className="text-xs text-gray-500 break-all">
-                      {user.email}
-                    </p>
+                    <p className="text-sm font-semibold text-gray-900">{user.name}</p>
+                    <p className="text-xs text-gray-500 break-all">{user.email}</p>
                   </div>
 
                   <div className="p-2">
-
                     <button
                       onClick={goToDashboard}
                       className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100 transition"
@@ -94,13 +91,22 @@ export default function Navbar({ user, setUser }) {
                       Dashboard
                     </button>
 
+                    {/* Verify inside dropdown too */}
+                    <button
+                      onClick={() => { navigate("/verify"); setDropdownOpen(false); }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100 transition"
+                    >
+                      <ShieldCheck size={16} />
+                      Verify Certificate
+                    </button>
+
                     <button
                       onClick={logout}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 rounded-md hover:bg-red-50 transition">
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 rounded-md hover:bg-red-50 transition"
+                    >
                       <LogOut size={16} />
                       Logout
                     </button>
-
                   </div>
                 </div>
               )}
@@ -108,7 +114,8 @@ export default function Navbar({ user, setUser }) {
           ) : (
             <button
               onClick={() => navigate("/login")}
-              className="px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition">
+              className="px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition"
+            >
               Sign In
             </button>
           )}

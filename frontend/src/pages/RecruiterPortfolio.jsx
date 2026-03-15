@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { 
-  ShieldCheck, 
-  Calendar, 
-  MapPin, 
-  Users, 
-  Award, 
-  Download, 
+import {
+  ShieldCheck,
+  Calendar,
+  MapPin,
+  Users,
+  Award,
   Share2,
-  ExternalLink 
+  ExternalLink,
+  CheckCircle
 } from 'lucide-react';
+import achievrLogo from '../assets/achievr-logo.png';
 
 const BACKEND_URL = 'http://localhost:5000';
 
@@ -18,6 +19,7 @@ export default function RecruiterPortfolio() {
   const [portfolio, setPortfolio] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetch(`${BACKEND_URL}/api/recruiter/profile/${slug}`)
@@ -35,29 +37,30 @@ export default function RecruiterPortfolio() {
       });
   }, [slug]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-orange-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-xl font-medium text-gray-600">Loading portfolio...</p>
-        </div>
-      </div>
-    );
-  }
+  const copyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  if (loading) return <LoadingState />;
 
   if (error || !portfolio?.success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-orange-50 flex items-center justify-center">
-        <div className="max-w-md text-center p-8 bg-white rounded-3xl shadow-2xl">
-          <ShieldCheck className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Portfolio Not Found</h1>
-          <p className="text-gray-600 mb-6">This profile doesn't exist or has no verified achievements.</p>
-          <Link 
-            to="/" 
-            className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 text-white font-semibold rounded-2xl hover:bg-orange-600 transition-all"
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
+        <div className="text-center max-w-sm">
+          <div className="w-14 h-14 bg-white border border-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+            <ShieldCheck className="w-7 h-7 text-gray-400" />
+          </div>
+          <h1 className="text-xl font-medium text-gray-900 mb-2">Portfolio Not Found</h1>
+          <p className="text-gray-500 font-light text-sm mb-8 leading-relaxed">
+            This profile doesn't exist or has no verified achievements.
+          </p>
+          <Link
+            to="/"
+            className="text-sm text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 px-6 py-2.5 rounded-lg transition-all shadow-sm"
           >
-            <span>← Back to AchievR</span>
+            Back to AchievR
           </Link>
         </div>
       </div>
@@ -66,156 +69,137 @@ export default function RecruiterPortfolio() {
 
   const { stats, student, topSkills, timeline } = portfolio;
 
-  // Copy to clipboard
-  const copyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    // Visual feedback (add toast later)
-    console.log('Copied:', window.location.href);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-rose-50">
+    <div className="min-h-screen bg-gray-50 text-gray-900">
+
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-md border-b border-orange-100 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2 font-bold text-xl bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-              AchievR
-            </Link>
-            <button
-              onClick={copyLink}
-              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-2xl hover:shadow-lg hover:scale-105 transition-all duration-200"
-            >
-              <Share2 size={18} />
-              Share Profile
-            </button>
-          </div>
+      <header className="border-b border-gray-200 bg-white/80 backdrop-blur sticky top-0 z-50 shadow-sm">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link to="/">
+            <img src={achievrLogo} alt="AchievR" className="h-8 w-auto" />
+          </Link>
+          <button
+            onClick={copyLink}
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 font-normal rounded-lg transition-all"
+          >
+            <Share2 size={14} />
+            {copied ? 'Copied!' : 'Share Profile'}
+          </button>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-3xl shadow-2xl mb-6">
-            <ShieldCheck size={28} />
+      <main className="max-w-5xl mx-auto px-6 py-16 space-y-10">
+
+        {/* Student Identity */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div>
-              <h1 className="text-4xl font-bold leading-tight">{student.name}</h1>
-              <p className="text-xl opacity-90">{student.rollNumber} • {student.department}</p>
+              <h1 className="text-2xl font-semibold text-gray-900 mb-3">{student.name}</h1>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-mono text-xs bg-orange-50 text-orange-600 border border-orange-200 px-3 py-1 rounded-full">
+                  {student.rollNumber}
+                </span>
+                <span className="text-xs bg-gray-100 border border-gray-200 text-gray-600 px-3 py-1 rounded-full capitalize">
+                  {student.department}
+                </span>
+                <span className="text-xs bg-gray-100 border border-gray-200 text-gray-600 px-3 py-1 rounded-full">
+                  Batch of {student.year}
+                </span>
+              </div>
             </div>
-          </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto">
-            <div className="bg-white/70 backdrop-blur p-8 rounded-3xl shadow-xl border border-orange-100 hover:shadow-2xl transition-all">
-              <div className="flex items-center gap-3 mb-2">
-                <Award className="w-10 h-10 text-orange-500" />
-                <h3 className="text-2xl font-bold text-gray-900">{stats.totalCertificates}</h3>
+            {/* Stats */}
+            <div className="flex items-center gap-6 text-center">
+              <div>
+                <p className="text-2xl font-semibold text-gray-900">{stats.totalCertificates}</p>
+                <p className="text-xs text-gray-400 font-light mt-0.5">Certificates</p>
               </div>
-              <p className="text-gray-600 font-medium">Verified Certificates</p>
-            </div>
-            <div className="bg-white/70 backdrop-blur p-8 rounded-3xl shadow-xl border border-blue-100 hover:shadow-2xl transition-all">
-              <div className="flex items-center gap-3 mb-2">
-                <Users className="w-10 h-10 text-blue-500" />
-                <h3 className="text-2xl font-bold text-gray-900">{stats.totalVerifications}</h3>
+              <div className="w-px h-10 bg-gray-200" />
+              <div>
+                <p className="text-2xl font-semibold text-gray-900">{stats.totalVerifications}</p>
+                <p className="text-xs text-gray-400 font-light mt-0.5">Verifications</p>
               </div>
-              <p className="text-gray-600 font-medium">Total Verifications</p>
-            </div>
-            <div className="bg-white/70 backdrop-blur p-8 rounded-3xl shadow-xl border border-green-100 hover:shadow-2xl transition-all">
-              <div className="flex items-center gap-3 mb-2">
-                <Calendar className="w-10 h-10 text-green-500" />
-                <h3 className="text-2xl font-bold text-gray-900">{student.year}</h3>
-              </div>
-              <p className="text-gray-600 font-medium">Batch of {student.year}</p>
             </div>
           </div>
         </div>
 
-        {/* Skills Cloud */}
+        {/* Skills */}
         {topSkills.technical.length > 0 && (
-          <section className="mb-20">
-            <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Mastered Skills</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {topSkills.technical.map((skill, idx) => (
-                <div 
-                  key={skill} 
-                  className="group p-6 bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-200 rounded-2xl hover:shadow-xl hover:scale-105 transition-all cursor-default"
+          <section>
+            <div className="flex items-center gap-2 text-gray-400 text-xs uppercase tracking-widest mb-4 font-normal">
+              <Award size={13} />
+              Mastered Skills
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {topSkills.technical.map((skill) => (
+                <span
+                  key={skill}
+                  className="text-sm bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-all cursor-default font-light shadow-sm"
                 >
-                  <h4 className="font-bold text-xl text-gray-900 group-hover:text-orange-600 mb-2">
-                    {skill}
-                  </h4>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full transition-all"
-                      style={{ width: `${Math.min(90, 40 + idx * 5)}%` }}
-                    />
-                  </div>
-                </div>
+                  {skill}
+                </span>
               ))}
             </div>
           </section>
         )}
 
-        {/* Achievements Timeline */}
+        {/* Achievements */}
         <section>
-          <h2 className="text-3xl font-bold text-gray-900 mb-12 flex items-center gap-3 justify-center">
-            <Award className="w-10 h-10 text-orange-500" />
+          <div className="flex items-center gap-2 text-gray-400 text-xs uppercase tracking-widest mb-4 font-normal">
+            <ShieldCheck size={13} />
             Verified Achievements
-          </h2>
+          </div>
 
-          <div className="grid gap-8">
+          <div className="space-y-3">
             {timeline.slice(0, 12).map((achievement, idx) => (
-              <div 
+              <div
                 key={idx}
-                className="group bg-white/70 backdrop-blur border border-gray-200 rounded-3xl p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 overflow-hidden"
+                className="bg-white hover:bg-gray-50 border border-gray-200 rounded-2xl p-6 transition-all group shadow-sm"
               >
-                <div className="flex items-start gap-6 mb-6">
-                  <div className="flex flex-col items-center w-16 flex-shrink-0 -mt-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
-                      <Award className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="w-px h-20 bg-gradient-to-b from-orange-500/50 to-transparent mt-2" />
-                  </div>
-
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between mb-3">
-                      <h3 className="text-2xl font-bold text-gray-900 group-hover:text-orange-600 pr-4 min-w-0 truncate">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-8 h-8 bg-orange-50 border border-orange-200 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Award size={14} className="text-orange-500" />
+                      </div>
+                      <h3 className="text-base font-medium text-gray-900 group-hover:text-orange-600 transition-colors leading-snug">
                         {achievement.title}
                       </h3>
-                      <div className="flex items-center gap-2 ml-4">
-                        <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">
-                          {achievement.verifications} ✓
-                        </span>
-                      </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-400 font-light ml-11">
                       <span className="flex items-center gap-1">
-                        <MapPin size={14} />
+                        <MapPin size={11} />
                         {achievement.level} • {achievement.category}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Calendar size={14} />
-                        {new Date(achievement.eventDate).toLocaleDateString()}
+                        <Calendar size={11} />
+                        {new Date(achievement.eventDate).toLocaleDateString('en-US', {
+                          year: 'numeric', month: 'short', day: 'numeric'
+                        })}
                       </span>
                       {achievement.organizer && (
-                        <span className="flex items-center gap-1 truncate max-w-[200px]">
-                          {achievement.organizer}
-                        </span>
+                        <span className="truncate max-w-[180px]">{achievement.organizer}</span>
                       )}
                     </div>
+                  </div>
 
-                    <div className="flex items-center gap-4 pt-4 border-t border-gray-200">
-                      <a
-                        href={achievement.verifyUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-2xl hover:shadow-lg hover:scale-105 transition-all group/link"
-                      >
-                        <ShieldCheck size={18} />
-                        View Certificate
-                        <ExternalLink size={16} className="group-hover:translate-x-1 transition-transform" />
-                      </a>
-                    </div>
+                  <div className="flex items-center gap-3 ml-11 sm:ml-0 flex-shrink-0">
+                    {achievement.verifications > 0 && (
+                      <span className="flex items-center gap-1 text-xs text-green-600 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full font-normal">
+                        <CheckCircle size={11} />
+                        {achievement.verifications}
+                      </span>
+                    )}
+                    <a
+                      href={achievement.verifyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-300 bg-gray-50 hover:bg-gray-100 px-4 py-2 rounded-lg transition-all shadow-sm"
+                    >
+                      View
+                      <ExternalLink size={11} />
+                    </a>
                   </div>
                 </div>
               </div>
@@ -223,27 +207,36 @@ export default function RecruiterPortfolio() {
           </div>
 
           {timeline.length > 12 && (
-            <div className="text-center mt-12">
-              <p className="text-gray-500 text-lg">
-                +{timeline.length - 12} more achievements
-              </p>
-            </div>
+            <p className="text-center text-gray-400 text-sm font-light mt-6">
+              +{timeline.length - 12} more achievements
+            </p>
           )}
         </section>
-      </div>
+      </main>
 
       {/* Footer */}
-      <div className="border-t border-gray-200 mt-24 pt-12">
-        <div className="max-w-6xl mx-auto px-6 text-center text-gray-500">
-          <p className="mb-4">
-            Verified achievements trusted by top recruiters • Powered by AchievR
+      <footer className="border-t border-gray-200 bg-white mt-16">
+        <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-gray-400 text-sm font-light">
+            Verified achievements powered by AchievR
           </p>
-          <div className="flex items-center justify-center gap-6 text-sm">
-            <Link to="/" className="hover:text-orange-500 transition-colors">AchievR Home</Link>
-            <span>•</span>
-            <a href="mailto:hello@achievr.in" className="hover:text-orange-500 transition-colors">Contact</a>
+          <div className="flex items-center gap-4 text-sm text-gray-400">
+            <Link to="/" className="hover:text-gray-700 transition-colors">Home</Link>
+            <span className="text-gray-200">•</span>
+            <a href="mailto:hello@achievr.in" className="hover:text-gray-700 transition-colors">Contact</a>
           </div>
         </div>
+      </footer>
+    </div>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
+      <div className="text-center">
+        <div className="w-12 h-12 border-2 border-gray-200 border-t-orange-500 rounded-xl animate-spin mx-auto mb-6" />
+        <p className="text-gray-400 font-light text-sm">Loading portfolio...</p>
       </div>
     </div>
   );
