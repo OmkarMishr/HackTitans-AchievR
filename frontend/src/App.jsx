@@ -7,7 +7,6 @@ import StudentDashboard from './pages/StudentDashboard';
 import FacultyDashboard from './pages/FacultyDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import SubmitActivity from './pages/SubmitActivity'
-// import PublicVerify from './pages/PublicVerify';
 import StudentProfile from './pages/StudentProfile';
 import Navbar from './components/Navbar'
 import VerifyCertificate from './pages/VerifyCertificate'
@@ -45,9 +44,7 @@ export default function App() {
         <Route path="/" element={<Landing user={user} setUser={setUser} />} />
         <Route path="/login" element={user ? <Navigate to={user.role === 'student' ? '/dashboard' : `/${user.role}`} /> : <Login setUser={setUser} />} />
         <Route path="/register" element={user ? <Navigate to={user.role === 'student' ? '/dashboard' : `/${user.role}`} /> : <Register />} />
-        {/* // <Route path="/verify/:hash" element={<PublicVerify />} /> */}
         <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
-
         <Route path="/portfolio/:slug" element={<RecruiterPortfolio />} />
 
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  ShieldCheck, CheckCircle, XCircle, Calendar, Award, Copy, User, MapPin
+ ShieldCheck, CheckCircle, XCircle, Calendar, Award, Copy, User, MapPin
 } from 'lucide-react';
 
 const BACKEND_URL = 'http://localhost:5000';
