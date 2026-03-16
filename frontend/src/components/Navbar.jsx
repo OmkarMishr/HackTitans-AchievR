@@ -31,7 +31,7 @@ export default function Navbar({ user, setUser }) {
             onClick={() => navigate("/")}
             className="flex items-center cursor-pointer">
             <img src={achievrLogo} alt="AchievR"
-              className="h-7 sm:h-10 md:h-11 w-auto object-contain" />
+              className="h-7 sm:h-10 w-auto object-contain" />
           </div>
 
           {/* Desktop Menu */}
