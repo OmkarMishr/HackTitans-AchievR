@@ -5,21 +5,17 @@ const certificateSchema = new mongoose.Schema({
   certificateId: {
     type: String,
     required: true,
-    unique: true,
-    index: true
   },
 
   activity: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Activity',
     required: true,
-    index: true
   },
   student: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
-    index: true
+    required: true
   },
 
   issuedBy: {
@@ -35,12 +31,10 @@ const certificateSchema = new mongoose.Schema({
   achievementLevel: {
     type: String,
     enum: ['College', 'University', 'State', 'National', 'International'],
-    default: 'College',
-    index: true
+    default: 'College'
   },
 
   eventDate: Date,
-
 
   pdfUrl: String,
   pdfPath: { type: String, required: true },
@@ -48,18 +42,21 @@ const certificateSchema = new mongoose.Schema({
   qrCodeUrl: String,
   qrCodePath: String,
 
+  verificationCode: String,
+  verificationCount: { type: Number, default: 0 },
+  lastVerifiedAt: Date,
+
   status: {
     type: String,
     enum: ['active', 'revoked'],
-    default: 'active',
-    index: true
+    default: 'active'
   },
 
   isRevoked: { type: Boolean, default: false },
   revocationReason: String,
   revokedAt: Date,
 
-  issuedAt: { type: Date, default: Date.now, index: true },
+  issuedAt: { type: Date, default: Date.now },
   expiresAt: {
     type: Date,
     default: () => new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
@@ -70,12 +67,11 @@ const certificateSchema = new mongoose.Schema({
   collection: 'certificates'
 });
 
-
 certificateSchema.index({ certificateId: 1 }, { unique: true });
 certificateSchema.index({ student: 1, issuedAt: -1 });
 certificateSchema.index({ status: 1 });
 
-
+// Virtuals
 certificateSchema.virtual('isValid').get(function () {
   return (
     this.status === 'active' &&
@@ -89,7 +85,7 @@ certificateSchema.virtual('daysUntilExpiry').get(function () {
   return Math.ceil((this.expiresAt - new Date()) / (1000 * 60 * 60 * 24));
 });
 
-//METHODS
+// Methods 
 certificateSchema.methods.revoke = function (reason) {
   this.isRevoked = true;
   this.status = 'revoked';
@@ -98,7 +94,7 @@ certificateSchema.methods.revoke = function (reason) {
   return this.save();
 };
 
-// STATs
+//Statics 
 certificateSchema.statics.findByStudent = function (studentId) {
   return this.find({ student: studentId }).sort({ issuedAt: -1 });
 };
@@ -106,4 +102,5 @@ certificateSchema.statics.findByStudent = function (studentId) {
 certificateSchema.statics.findActive = function () {
   return this.find({ status: 'active', isRevoked: false });
 };
+
 module.exports = mongoose.model('Certificate', certificateSchema);
