@@ -12,7 +12,7 @@ export default function AchievRHero({ user }) {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#faf8f5] overflow-hidden font-sans">
+<div className="relative min-h-screen bg-[#faf8f5] overflow-visible z-0 font-sans">
 
       {/* Warm radial glow — centre top */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[420px] rounded-full bg-orange-100/80 blur-[90px] pointer-events-none" />
