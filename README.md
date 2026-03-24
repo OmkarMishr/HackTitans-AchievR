@@ -1,409 +1,370 @@
 # AchievR - Student Achievement Verification Platform
 
-> **Transform student achievements into verified, blockchain-ready professional credentials**
+> **Transform student achievements into verified, tamper-proof digital credentials — verified in 2 seconds, not 2 weeks**
 
-[![React](https://img.shields.io/badge/React-18-blue?logo=react)](https://reactjs.org/)
-[![Express](https://img.shields.io/badge/Express.js-4.x-green?logo=express)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-6.x-brightgreen?logo=mongodb)](https://www.mongodb.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-**Live:** [achievr-demo.vercel.app](#) 
-
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Project Structure](#project-structure)
-- [API Documentation](#api-documentation)
-- [Screenshots](#screenshots)
-- [Contributing](#contributing)
-- [License](#license)
-- [Team](#team)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Visit_Now-6366f1?style=for-the-badge)](https://dnvba07nlq4dm.cloudfront.net)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-6.x-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![AWS](https://img.shields.io/badge/AWS-S3+CloudFront-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 ---
 
-## Overview
+## 🧩 What is AchievR?
 
-**AchievR** is an enterprise-grade credential verification platform that eliminates manual certificate validation for educational institutions. Built for **HackOMania 2025**, it reduces verification time from weeks to seconds using QR-verified digital certificates.
+AchievR is a production-ready, full-stack credential verification platform built for educational institutions. It eliminates manual certificate validation by providing **faculty-approved digital portfolios** with **QR-code verified certificates** - reducing verification time from weeks to **under 2 seconds**. It also acts as a **centralized platform where all achievement certificates are securely stored and easily accessible**.
 
-### Problem Statement
+> **Problem:** Students scatter achievements across emails & documents. Institutions spend weeks on manual verification for placements. Recruiters face fake certificate fraud in hiring.
 
-- Students maintain scattered achievements across emails, certificates, and documents
-- Institutions spend weeks manually verifying credentials for placements/admissions
-- Recruiters face 30%+ fake certificate fraud in hiring
-- Accreditation bodies (NAAC/NBA) demand centralized activity tracking
+> **Solution:** A single source of truth — faculty-verified portfolios, instant QR validation, and recruiter-facing shareable public profiles.
 
-### Our Solution
+---
+<!-- 
+## 🖥️ Screenshots
 
-AchievR provides a **single source of truth** for student achievements with:
-- Faculty-approved digital portfolios
-- QR-code certificate verification (2-second validation)
-- Recruiter-facing public profiles
-- Institutional analytics dashboards
+| Landing Page | Student Dashboard |
+|---|---|
+| ![Landing](./frontend/public/Landing.png) | ![Dashboard](./frontend/public/Student-dashboard.png) |
+
+| Certificate Generation | Call To Action |
+|---|---|
+| ![Certificate](./frontend/public/Certificate-Generation.png) | ![CTA](./frontend/public/CTA.png) |
+
+--- -->
+
+## ✨ Features
+
+### 🎓 For Students
+- **Unified Portfolio** - Submit and track academic, technical, sports & cultural achievements
+- **Smart Skill Tagging** - 60+ predefined competencies + custom skill support
+- **Instant QR Certificates** - Auto-generated upon faculty approval, publicly verifiable
+- **Shareable Public Profile** - Unique portfolio URL (e.g. `/portfolio/:id`) for recruiters
+
+### 🏛️ For Academic Institutions
+- **Approval Workflow** — Review, approve or reject student submissions with proof document access
+- **Multi-Role Dashboards** — Student / Faculty / Admin with JWT-based role-based access control
 
 ---
 
-## Features
-
-### For Students
-- **Unified Portfolio** - Track academic, technical, sports, and cultural achievements
-- **Smart Skill Tagging** - 60+ predefined competencies + custom skills
-- **Instant Certificates** - QR-verified digital credentials
-- **Shareable Profiles** - Public portfolio links for recruiters
-
-### For Faculty
-- **One-Click Approval** - Review and approve student submissions
-- **Proof Document Validation** - View/download supporting evidence
-- **Bulk Certificate Generation** - Automated QR certificate creation
-- **Activity Analytics** - Track department-wise participation
-
-### For Institutions
-- **Multi-Role Access** - Student/Faculty/Admin dashboards
-- **Real-Time Reporting** - NAAC/NBA-ready analytics
-- **Email Automation** - Nodemailer-powered notifications
-- **Scalable Architecture** - Handles 1000+ concurrent submissions
-
----
-
-## Tech Stack
+## 🛠️ Tech Stack
 
 ### Frontend
-
-React 18          - Component-based UI architecture
-Tailwind CSS      - Utility-first responsive design
-React Router      - Protected route management
-Recharts          - Analytics visualizations
-Lucide React      - Modern icon library
-Axios             - HTTP client for API calls
-
+| Technology | Purpose |
+|---|---|
+| React 18 | Component-based UI |
+| Tailwind CSS | Utility-first responsive design |
+| React Router v6 | Client-side routing with protected routes |
+| Recharts | Analytics & data visualizations |
+| Axios | HTTP client for API communication |
 
 ### Backend
+| Technology | Purpose |
+|---|---|
+| Node.js + Express.js | RESTful API server |
+| MongoDB + Mongoose | NoSQL database with schema modeling |
+| JWT + Bcrypt | Stateless authentication + password hashing |
+| Multer | Proof document file upload handling |
 
-Node.js           - JavaScript runtime
-Express.js        - RESTful API framework
-MongoDB           - NoSQL database
-Mongoose          - ODM for schema modeling
-JWT               - Stateless authentication
-Bcrypt            - Password hashing
-Nodemailer        - Email automation
-Multer            - File upload handling
-
-
-### DevOps & Tools
-
-Git/GitHub        - Version control
-Postman           - API testing
-VS Code           - Development environment
-Vercel/Netlify    - Frontend deployment (planned)
-Railway/Render    - Backend deployment (planned)
-
+### Infrastructure
+| Technology | Purpose |
+|---|---|
+| AWS S3 | Frontend static hosting |
+| AWS CloudFront | Global CDN with edge delivery |
+| Render | Backend API deployment |
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
-bash
-Node.js >= 16.x
-MongoDB >= 6.x
-npm or yarn
+### 1. Clone the repository
+git clone https://github.com/OmkarMishr/HackTitans-AchievR.git  
+cd HackTitans-AchievR  
 
+### 2. Backend Setup
+cd backend  
+npm install  
+cp .env.example .env  
+# Add your MongoDB URI, JWT_SECRET, and email credentials  
+npm start  
+# API running at http://localhost:5000  
 
-### Installation
-
-**1. Clone the repository**
-bash
-git clone https://github.com/OmkarMishr/HackTitans-AchievR.git
-cd HackTitans-AchievR
-
-
-**2. Setup Backend**
-bash
-cd backend
-npm install
-
-# Create .env file
-cp .env.example .env
-# Edit .env with your MongoDB URI, JWT secret, email credentials
-
-
-**3. Setup Frontend**
-bash
-cd ../frontend
-npm install
-
-
-**4. Run Development Servers**
-
-**Terminal 1 - Backend:**
-bash
-cd backend
-npm start
-# Server runs on http://localhost:5000
-
-
-**Terminal 2 - Frontend:**
-bash
-cd frontend
-npm run dev
-# App runs on http://localhost:3000
-
-
-**5. Access the Application**
-
-Frontend: http://localhost:3000
-Backend:  http://localhost:5000/api
-
+### 3. Frontend Setup
+cd ../frontend  
+npm install  
+npm run dev  
+# App running at http://localhost:5174  
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
-
+```
 HackTitans-AchievR/
 ├── backend/
-│   ├── models/              # Mongoose schemas
-│   │   ├── User.js
+│   ├── config/
+│   │   └── db.js
+│   ├── controllers/
+│   │   ├── activity.controller.js
+│   │   ├── auth.controller.js
+│   │   ├── certificate.controller.js
+│   │   └── recruiter.controller.js
+│   ├── middleware/
+│   │   └── auth.js
+│   ├── models/
 │   │   ├── Activity.js
-│   │   └── Certificate.js
-│   ├── routes/              # Express routes
-│   │   ├── auth.js
+│   │   ├── Certificate.js
+│   │   ├── StudentSkills.js
+│   │   └── User.js
+│   ├── routes/
 │   │   ├── activities.js
-│   │   └── certificates.js
-│   ├── middleware/          # Auth & validation
-│   ├── uploads/             # File storage
-│   ├── .env                 # Environment variables
-│   └── server.js            # Entry point
+│   │   ├── auth.js
+│   │   ├── certificates.js
+│   │   ├── public.js
+│   │   └── recruiter.js
+│   ├── services/
+│   │   └── certificateService.js
+│   ├── .env
+│   ├── .gitignore
+│   ├── package.json
+│   ├── package-lock.json
+│   └── server.js
 │
 ├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── SkillSelector.jsx
-│   │   │   └── ...
-│   │   ├── pages/
-│   │   │   ├── StudentDashboard.jsx
-│   │   │   ├── FacultyDashboard.jsx
-│   │   │   ├── SubmitActivity.jsx
-│   │   │   └── ...
-│   │   ├── App.jsx
-│   │   └── main.jsx
 │   ├── public/
-│   └── package.json
+│   ├── src/
+│   │   ├── api/
+│   │   │   └── apiClient.js
+│   │   ├── assets/
+│   │   ├── components/
+│   │   │   ├── Landing/
+│   │   │   │   ├── Animations.css
+│   │   │   │   ├── CTA.jsx
+│   │   │   │   ├── FAQ.jsx
+│   │   │   │   ├── Footer.jsx
+│   │   │   │   ├── Hero.jsx
+│   │   │   │   ├── Navbar.jsx
+│   │   │   │   ├── Problem.jsx
+│   │   │   │   ├── Steps.jsx
+│   │   │   │   └── Testimonials.jsx
+│   │   │   ├── Student/
+│   │   │   │   ├── AchievementDashboard.jsx
+│   │   │   │   ├── PortfolioPreview.jsx
+│   │   │   │   ├── Footer.jsx
+│   │   │   │   ├── Navbar.jsx
+│   │   │   │   └── SkillSelector.jsx
+│   │   ├── pages/
+│   │   │   ├── AdminDashboard.jsx
+│   │   │   ├── FacultyDashboard.jsx
+│   │   │   ├── Landing.jsx
+│   │   │   ├── Login.jsx
+│   │   │   ├── RecruiterPortfolio.jsx
+│   │   │   ├── Register.jsx
+│   │   │   ├── StudentDashboard.jsx
+│   │   │   ├── StudentProfile.jsx
+│   │   │   ├── SubmitActivity.jsx
+│   │   │   ├── validateCertificate.jsx
+│   │   │   └── VerifyCertificate.jsx
+│   │   ├── services/
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
+│   ├── .env
+│   ├── .env.production
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── vite.config.js
+│   └── README.md
 │
 └── README.md
+```
 
+## 📡 API Reference
 
+### 🔐 Auth APIs
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Register new user (student/faculty) |
+| POST | `/api/auth/login` | Login and get JWT token |
+| GET | `/api/auth/me` | Get current logged-in user (protected) |
+| POST | `/api/auth/logout` | Logout (client-side token removal) |
 
 ---
 
-## API Documentation
+### 👤 User / Portfolio APIs
 
-### Authentication Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/recruiter/profile/:id` | Get student portfolio (by ID or slug) |
 
-**POST** `/api/auth/register`
-json
+---
+
+### 📝 Activity APIs
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/activities/submit` | Submit new achievement | Student |
+| GET | `/api/activities/my-activities` | Get logged-in user's activities | Student |
+| PUT | `/api/activities/:id/approve` | Approve activity | Faculty |
+| PUT | `/api/activities/:id/reject` | Reject activity | Faculty |
+| GET | `/api/activities/pending` | Get all pending activities | Faculty |
+| GET | `/api/activities/admin/all` | Get all activities | Admin |
+| GET | `/api/activities/admin/approved` | Get approved activities | Admin |
+
+---
+
+### 🏆 Certificate APIs
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/certificates/generate/:activityId` | Generate certificate (PDF + S3 upload) |
+| GET | `/api/certificates/download/:certificateId` | Download certificate PDF |
+| GET | `/api/certificates/verify/:certificateId` | Verify certificate authenticity |
+| GET | `/api/certificates/stats` | Get certificate statistics |
+
+---
+
+## 📌 Example — Register User
+
+```json
+POST /api/auth/register
+
 {
-  "name": "John Doe",
-  "email": "john@university.edu",
-  "password": "securepass123",
-  "role": "student"
+  "name": "Shashank Mishra",
+  "email": "shashank@email.com",
+  "password": "123456",
+  "role": "student",
+  "rollNumber": "21CS101",
+  "department": "CSE",
+  "year": "3"
 }
+```
 
+---
 
-**POST** `/api/auth/login`
-json
+## 📌 Example — Login
+
+```json
+POST /api/auth/login
+
 {
-  "email": "john@university.edu",
-  "password": "securepass123"
+  "email": "shashank@email.com",
+  "password": "123456"
 }
+```
 
+---
 
-### Activity Endpoints
+## 📌 Example — Submit Activity
 
-**GET** `/api/activities/my-activities`  
-Headers: `Authorization: Bearer <token>`
+```json
+POST /api/activities/submit
+Authorization: Bearer <token>
 
-**POST** `/api/activities/submit`
-json
 {
-  "title": "Hackathon Winner",
+  "title": "1st Place - National Hackathon",
+  "description": "Built a full-stack credential platform in 24 hours",
   "category": "Technical",
-  "description": "Won first prize...",
   "eventDate": "2025-01-15",
+  "organizingBody": "Government of India",
+  "achievementLevel": "National",
   "selectedTechnicalSkills": ["React", "Node.js"],
-  "proofDocuments": [...]
+  "selectedSoftSkills": ["Teamwork", "Leadership"],
+  "selectedTools": ["Git", "Docker"]
 }
-
-
-**PUT** `/api/activities/:id/approve`  
-Headers: `Authorization: Bearer <faculty-token>`
-
-### Certificate Endpoints
-
-**POST** `/api/certificates/generate/:activityId`  
-**GET** `/api/certificates/verify/:certificateId`  
-**GET** `/api/certificates/download/:certificateId`
+```
 
 ---
 
-## Screenshots
+## 📌 Example — Verify Certificate
 
-### Landing Page
-![Landing Page](./frontend//public/Landing.png)
+```json
+GET /api/certificates/verify/CERT_123456
+```
 
-### Call To Action
-![CTA](./frontend/public/CTA.png)
-
-### Student Dashboard
-![Student Dashboard](./frontend//public/Student-dashboard.png)
-
-### Certificate Generation
-![Certificate](./frontend/public/Certificate-Generation.png)
-
-
----
-
-## Key Highlights
-
-
-95% Faster Verification    - Weeks → 2 seconds
-Enterprise Security        - JWT + Bcrypt + Role-based access
-Real-Time Analytics        - Recharts dashboards
-Automated Workflows        - Nodemailer email notifications
-Mobile-First Design        - Tailwind CSS responsive UI
-QR Verification           - Instant credential validation
-
+Response:
+```json
+{
+  "status": "valid",
+  "data": {
+    "certId": "CERT_123456",
+    "student": "Shashank Mishra",
+    "achievement": "National Hackathon Winner",
+    "verifiedCount": 5
+  }
+}
+```
 
 ---
 
-## Roadmap
+## 🔐 Authentication
 
-- [ ] Deploy to production (Vercel + Railway)
-- [ ] Blockchain integration for immutable certificates
-- [ ] AI-powered skill extraction from descriptions
-- [ ] Multi-institution white-label deployment
-- [ ] LinkedIn/Naukri.com API integration
-- [ ] Mobile app (React Native)
+- Uses **JWT (JSON Web Token)**
+- Token must be sent in headers:
 
----
+```
+Authorization: Bearer <your_token>
+```
 
-## Contributing
-
-We welcome contributions! Please follow these steps:
-
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open Pull Request
+- Token contains:
+  - `userId`
+  - `role` (student / faculty / admin)
 
 ---
 
-## License
+## ⚙️ Notes
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
+- Activities must be **approved** before certificate generation  
+- Certificates are:
+  - Stored in **AWS S3**
+  - **Tamper-proof**
+  - Publicly verifiable via QR / ID  
+- Skills are tracked and used to compute **student skill score**
 
 ---
 
-##  Team - Hack Titans
+## 📊 Impact
+
+| Metric | Traditional | AchievR |
+|--------|-------------|---------|
+| Verification Time | 2–3 weeks | **< 2 seconds** |
+| Certificate Authenticity | Manual, error-prone | **QR-verified, tamper-proof** |
+| Student Portfolio Access | Scattered files | **Single public URL** |
+| Institutional Reporting | Manual (days) | **Real-time dashboard** |
+
+---
+
+## 👥 Built By
 
 | Name | Role | GitHub | LinkedIn |
 |------|------|--------|----------|
-| **Shashank Mishra** | Full Stack Developer | [@shashankmishra21](https://github.com/shashankmishra21) | [LinkedIn](https://www.linkedin.com/in/mishrashashank2106/) |
-| **Omkar Mishra** | Full Stack Developer | [@OmkarMishr](https://github.com/OmkarMishr) | [LinkedIn](https://www.linkedin.com/in/omkar-mishra-b3677b246/) |
-| **Nihal Sharma** | Frontend Developer | [@nihalsharma2005](https://github.com/nihalsharma2005) | [LinkedIn](https://www.linkedin.com/in/nihalsharma2005/) |
-| **Aman minz** | UI-UX designer | [@AmanMInz-in](https://github.com/AmanMInz-in) | [LinkedIn](https://www.linkedin.com/in/amanminz/) |
+| Shashank Mishra | Full Stack Developer | [@shashankmishra21](https://github.com/shashankmishra21) | [LinkedIn](https://www.linkedin.com/in/mishrashashank2106/) |
+| Omkar Mishra | Full Stack Developer | [@OmkarMishr](https://github.com/OmkarMishr) | [LinkedIn](https://www.linkedin.com/in/omkar-mishra-b3677b246/) |
 
 ---
 
-## Achievements
+## 🤝 Contributing
 
-- **HackOMania 2025** - Best Enterprise Solution
-- Featured on GitHub Trending (India)
-- 1000+ Activities Processed (Demo)
-
----
-
-## Contact & Support
-
-- **Email:** achievr591@gmail.com
-- **Issues:** [GitHub Issues](https://github.com/OmkarMishr/HackTitans-AchievR/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/OmkarMishr/HackTitans-AchievR/discussions)
+git checkout -b feature/your-feature  
+git commit -m "feat: describe your change"  
+git push origin feature/your-feature  
 
 ---
 
-## Acknowledgements
+## 📄 License
 
-- [React Documentation](https://react.dev/)
-- [Express.js](https://expressjs.com/)
-- [MongoDB University](https://university.mongodb.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- HackOMania 2025 Organizing Committee
+MIT License © 2025 Shashank Mishra & Omkar Mishra  
 
 ---
-
-## *Additional Files to Create*
-
-### *.env.example (Backend)*
-env
-# Server Configuration
-PORT=5000
-NODE_ENV=development
-
-# Database
-MONGODB_URI=mongodb://localhost:27017/achievr
-
-# JWT Secret
-JWT_SECRET=your_super_secret_jwt_key_change_in_production
-
-# Email Configuration (Nodemailer)
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-app-specific-password
-
-# Frontend URL (for CORS)
-FRONTEND_URL=http://localhost:3000
-
-# File Upload
-MAX_FILE_SIZE=100MB
-UPLOAD_DIR=./uploads
-
-
-### *LICENSE (MIT License)*
-
-MIT License
-
-Copyright (c) 2025 Hack Titans
-
-Permission is hereby granted, free of charge, to any person obtaining a copy...
-(full MIT license text)
-
-
-### *CONTRIBUTING.md*
-markdown
-# Contributing to AchievR
-
-Thank you for your interest! Please read our guidelines...
-
-
-
 
 <div align="center">
 
-**Build with care by Hack Titans**
+⭐ Star this repo if AchievR impressed you!  
 
-**Star this repo if you find it useful!**
-
-[Report Bug](https://github.com/OmkarMishr/HackTitans-AchievR/issues) · 
-[Request Feature](https://github.com/OmkarMishr/HackTitans-AchievR/issues) · 
-[Documentation](https://github.com/OmkarMishr/HackTitans-AchievR/blob/main/README.md)
+Built with ❤️ by Shashank Mishra & Omkar Mishra  
 
 </div>
-
-
