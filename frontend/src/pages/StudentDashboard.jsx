@@ -18,6 +18,7 @@ export default function StudentDashboard({ user }) {
     skillsCount: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const navigate = useNavigate();
 
@@ -87,21 +88,18 @@ export default function StudentDashboard({ user }) {
     }
   };
 
-  const formatDate = (date) => {
-    if (!date) return "—";
-    const d = new Date(date);
-    if (isNaN(d)) return "—";
-    return d.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
   const certificationRate =
     stats.total > 0
       ? Math.round((stats.certified / stats.total) * 100)
       : 0;
+
+  const filteredActivities = activities.filter((activity) => {
+    if (statusFilter === "all") return true;
+    if (statusFilter === "certified") return activity.status === "certified";
+    if (statusFilter === "rejected") return activity.status === "rejected";
+    if (statusFilter === "pending") return activity.status === "pending";
+    return true;
+  });
 
   if (loading) {
     return (
@@ -133,9 +131,8 @@ export default function StudentDashboard({ user }) {
           {/* ACTIONS */}
           <div className="flex flex-wrap items-center gap-3">
 
-            {/* View Portfolio — opens recruiter page in new tab */}
             <button
-              onClick={() => window.open(`/portfolio/${user?.id}`, '_blank')}
+              onClick={() => window.open(`/portfolio/${user?.id}`, "_blank")}
               className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50 hover:shadow-sm transition"
             >
               <ExternalLink size={15} />
@@ -149,19 +146,43 @@ export default function StudentDashboard({ user }) {
               <Plus size={15} />
               Add Activity
             </button>
-
           </div>
         </div>
+
         <ActivityStats
           stats={stats}
           certificationRate={certificationRate}
-          activities={activities}
+          activities={filteredActivities}
         />
+
+        {/* FILTER BUTTONS */}
+        <div className="mb-4 sm:mb-6 bg-white p-3 sm:p-4 rounded-xl border border-gray-200">
+          <div className="flex flex-wrap gap-2">
+            {[
+              { key: "all", label: "All" },
+              { key: "certified", label: "Certified" },
+              { key: "pending", label: "Under Review" },
+              { key: "rejected", label: "Rejected" },
+            ].map((filter) => (
+              <button
+                key={filter.key}
+                onClick={() => setStatusFilter(filter.key)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  statusFilter === filter.key
+                    ? "bg-orange-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-700"
+                }`}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <AchievementDashboard
           stats={stats}
           certificationRate={certificationRate}
-          activities={activities}
+          activities={filteredActivities}
           handleDownloadCertificate={handleDownloadCertificate}
           navigate={navigate}
         />
