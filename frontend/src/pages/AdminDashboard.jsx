@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import apiClient from '../api/apiClient';
-import { Award, CheckCircle, FileCheck, Loader, AlertCircle, TrendingUp, RefreshCw } from 'lucide-react';
+import { Award, CheckCircle, FileCheck, Loader, RefreshCw } from 'lucide-react';
+import AdminStats from "../components/Admin/AdminStats";
 import Footer from '../components/Footer';
 
 export default function AdminDashboard() {
-
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [certifying, setCertifying] = useState(null);
@@ -17,18 +17,33 @@ export default function AdminDashboard() {
   });
   const [searchTerm, setSearchTerm] = useState('');
 
+  const [adminStatsData, setAdminStatsData] = useState({
+    users: 0,
+    students: 0,
+    staff: 0,
+    admins: 0,
+    activities: 0,
+    certificates: 0,
+    certified: 0,
+    pending: 0,
+    rejected: 0,
+  });
 
   useEffect(() => {
     fetchApprovedActivities();
   }, []);
 
-
   const fetchApprovedActivities = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/activities/admin/approved');
 
-      const activitiesList = response.data.activities || [];
+      const [approvedResponse, allActivitiesResponse, certificateStatsResponse] = await Promise.all([
+        apiClient.get('/activities/admin/approved'),
+        apiClient.get('/activities/admin/all'),
+        apiClient.get('/certificates/stats')
+      ]);
+
+      const activitiesList = approvedResponse.data.activities || [];
       setActivities(activitiesList);
 
       const certified = activitiesList.filter(a => a.certificateId).length;
@@ -43,13 +58,39 @@ export default function AdminDashboard() {
         rate
       });
 
+      const allActivities = allActivitiesResponse?.data?.activities || [];
+      const certificateStats = certificateStatsResponse?.data || {};
+
+      const certifiedAll = allActivities.filter(
+        a => a.status === "certified" || a.status === "approved" || a.certificateId
+      ).length;
+
+      const pendingAll = allActivities.filter(
+        a => a.status === "pending" || a.status === "under_review" || (!a.certificateId && (a.status === "approved" || a.status === "certified"))
+      ).length;
+
+      const rejectedAll = allActivities.filter(
+        a => a.status === "rejected"
+      ).length;
+
+      setAdminStatsData({
+        users: certificateStats.users || 0,
+        students: certificateStats.students || 0,
+        staff: certificateStats.staff || 0,
+        admins: certificateStats.admins || 0,
+        activities: allActivities.length,
+        certificates: certificateStats.totalCertificates || certificateStats.certificates || certifiedAll,
+        certified: certifiedAll,
+        pending: pendingAll,
+        rejected: rejectedAll,
+      });
+
     } catch (error) {
       alert('Error loading activities: ' + error.message);
     } finally {
       setLoading(false);
     }
   };
-
 
   const handleGenerateCertificate = async (activity) => {
     if (!activity || !activity._id) {
@@ -69,7 +110,6 @@ export default function AdminDashboard() {
     }
   };
 
-
   const filteredActivities = activities
     .filter(a => a?.student)
     .filter(activity => {
@@ -79,6 +119,64 @@ export default function AdminDashboard() {
     })
     .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
+  const monthlyData = useMemo(() => {
+    const monthMap = {};
+
+    activities.forEach((activity) => {
+      const rawDate =
+        activity.createdAt ||
+        activity.submittedAt ||
+        activity.updatedAt ||
+        activity.date;
+
+      if (!rawDate) return;
+
+      const d = new Date(rawDate);
+      if (isNaN(d)) return;
+
+      const key = d.toLocaleDateString("en-US", {
+        month: "short",
+        year: "2-digit",
+      });
+
+      if (!monthMap[key]) {
+        monthMap[key] = {
+          month: key,
+          activities: 0,
+          certificates: 0,
+        };
+      }
+
+      monthMap[key].activities += 1;
+
+      if (activity.certificateId || activity.status === "certified") {
+        monthMap[key].certificates += 1;
+      }
+    });
+
+    return Object.values(monthMap).slice(-8);
+  }, [activities]);
+
+  const departmentData = useMemo(() => {
+    const deptMap = {};
+
+    activities.forEach((activity) => {
+      const key =
+        activity.department ||
+        activity.category ||
+        activity.domain ||
+        activity.batch ||
+        activity.studentDepartment ||
+        "Other";
+
+      deptMap[key] = (deptMap[key] || 0) + 1;
+    });
+
+    return Object.entries(deptMap)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6);
+  }, [activities]);
 
   if (loading) {
     return (
@@ -136,6 +234,12 @@ export default function AdminDashboard() {
             color="from-purple-500 to-purple-600"
           />
         </div>
+
+        <AdminStats
+          stats={adminStatsData}
+          monthlyData={monthlyData}
+          departmentData={departmentData}
+        />
 
         {/* Search Bar */}
         <div className="mb-4 sm:mb-6 bg-white p-3 sm:p-4 rounded-xl border-2 border-gray-200">
@@ -316,11 +420,10 @@ export default function AdminDashboard() {
       </div>
       <Footer />
     </div>
-
   );
 }
 
-function StatCard({ label, value, icon, color }) {
+function StatCard({ label, value, color }) {
   return (
     <div className={`bg-gradient-to-br ${color} text-white rounded-xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition`}>
       <div className="flex items-center justify-between">
@@ -328,7 +431,6 @@ function StatCard({ label, value, icon, color }) {
           <p className="text-xs sm:text-sm opacity-90 font-light">{label}</p>
           <p className="text-2xl sm:text-4xl font-bold mt-1 sm:mt-2">{value}</p>
         </div>
-        <div className="opacity-20 text-4xl sm:text-6xl">{icon}</div>
       </div>
     </div>
   );

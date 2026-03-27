@@ -21,37 +21,6 @@ export default function AchievementDashboard({
 
   return (
     <div className="space-y-8">
-
-      {/* KPI CARDS  */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-
-        <div className="bg-slate-900 text-white rounded-xl p-5 shadow-sm hover:shadow-md transition">
-          <p className="text-sm opacity-80">Total Activities</p>
-          <p className="mt-2 text-2xl font-semibold">{stats.total}</p>
-        </div>
-
-        <div className="bg-emerald-600 text-white rounded-xl p-5 shadow-sm hover:shadow-md transition">
-          <p className="text-sm opacity-80">Certified</p>
-          <p className="mt-2 text-2xl font-semibold">{stats.certified}</p>
-        </div>
-
-        <div className="bg-amber-500 text-white rounded-xl p-5 shadow-sm hover:shadow-md transition">
-          <p className="text-sm opacity-80">Under Review</p>
-          <p className="mt-2 text-2xl font-semibold">{stats.pending}</p>
-        </div>
-
-        <div className="bg-rose-500 text-white rounded-xl p-5 shadow-sm hover:shadow-md transition">
-          <p className="text-sm opacity-80">Rejected</p>
-          <p className="mt-2 text-2xl font-semibold">{stats.rejected}</p>
-        </div>
-
-        <div className="bg-indigo-600 text-white rounded-xl p-5 shadow-sm hover:shadow-md transition">
-          <p className="text-sm opacity-80">Success Rate</p>
-          <p className="mt-2 text-2xl font-semibold">{certificationRate}%</p>
-        </div>
-
-      </div>
-
       {/*TABLE */}
       <div className="rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 overflow-hidden">
 

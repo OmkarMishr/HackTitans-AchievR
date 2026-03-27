@@ -5,6 +5,7 @@ import { Plus, ExternalLink, Loader } from "lucide-react";
 import toast from "react-hot-toast";
 
 import AchievementDashboard from "../components/Student/AchievementDashboard";
+import ActivityStats from "../components/Student/ActivityStats";
 import Footer from "../components/Footer";
 
 export default function StudentDashboard({ user }) {
@@ -151,6 +152,11 @@ export default function StudentDashboard({ user }) {
 
           </div>
         </div>
+        <ActivityStats
+          stats={stats}
+          certificationRate={certificationRate}
+          activities={activities}
+        />
 
         <AchievementDashboard
           stats={stats}
