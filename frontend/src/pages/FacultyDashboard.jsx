@@ -147,8 +147,8 @@ export default function FacultyDashboard() {
       return;
     }
 
-    const baseURL = import.meta.env.VITE_API_URL;
-    window.open(`${baseURL}/certificates/verify/${certificateId}`, '_blank');
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+    window.open(`${BACKEND_URL}certificates/verify/${certificateId}`, '_blank');
   };
 
   const handleDownloadCertificate = async (certificateId) => {
@@ -418,10 +418,10 @@ export default function FacultyDashboard() {
 
                         <div className="space-y-2">
                           {selectedActivity.proofDocuments.map((doc, index) => {
-                            const baseURL = import.meta.env.VITE_API_URL.replace('/api', '');
+                            const BACKEND_URL = import.meta.env.VITE_BACKEND_URL.replace('/api', '');
                             const url = doc.url || doc.path;
                             const fullUrl = url
-                              ? (url.startsWith('http') ? url : `${baseURL}${url.startsWith('/') ? url : '/' + url}`)
+                              ? (url.startsWith('http') ? url : `${BACKEND_URL}${url.startsWith('/') ? url : '/' + url}`)
                               : null;
 
                             return (
